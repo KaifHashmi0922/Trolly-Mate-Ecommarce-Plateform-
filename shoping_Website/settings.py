@@ -83,25 +83,33 @@ LOGIN_REDIRECT_URL = "dashbord"
 
 
 
+IS_PRODUCTION = os.environ.get('RENDER') == 'true'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if IS_PRODUCTION:
+    # 🔵 DEPLOY DATABASE (Render / Production)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ.get('bixpyoq4qb6tzhkvxiyh'),
+            'USER': os.environ.get('u1n8nhuablnatowr'),
+            'PASSWORD': os.environ.get('AjcE1S2hz680FU3Ln6Nw'),
+            'HOST': os.environ.get('bixpyoq4qb6tzhkvxiyh-mysql.services.clever-cloud.com'),
+            'PORT': os.environ.get('3306'),
+        }
     }
-}
+else:
+    # 🟢 LOCAL DATABASE
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'shoping_website',
+            'USER': 'root',
+            'PASSWORD': 'root',
+            'HOST': 'localhost',
+            'PORT': '3306',
+        }
+    }
 
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'shoping_web_db',   
-#         'USER': 'root',
-#         'PASSWORD':'kaif',
-#         'PORT':3306,
-#         'HOST':'localhost',
-#     }
-# }
 
 
 # Password validation
