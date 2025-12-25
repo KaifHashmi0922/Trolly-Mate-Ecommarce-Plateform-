@@ -1,0 +1,171 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <!-- SUCCESS ANIMATION -->
+      <div class="text-center mb-5">
+        <div style="font-size: 80px; margin-bottom: 20px;">
+          ✅
+        </div>
+        <h2 class="fw-bold text-success mb-2">Order Placed Successfully!</h2>
+        <p class="text-muted">Thank you for shopping with us</p>
+      </div>
+
+      <!-- ORDER DETAILS CARD -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-bag-check"></i> Order Summary
+          </h5>
+        </div>
+        <div class="card-body">
+          <!-- ORDER ID -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">Order ID</h6>
+              <p class="h6 font-monospace">TM-{{ orders.0.id }}-2025</p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">Order Date</h6>
+              <p class="h6">{{ orders.0.shop_date|date:"d M Y" }}</p>
+            </div>
+          </div>
+
+          <!-- ORDER ITEMS -->
+          <h6 class="mb-3">
+            <i class="bi bi-list-check"></i> Items Ordered ({{ total_items }} Items)
+          </h6>
+          <div class="table-responsive mb-4">
+            <table class="table table-sm">
+              <thead class="table-light">
+                <tr>
+                  <th>Product</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in orders %}
+                <tr>
+                  <td><strong>{{ order.p_name }}</strong></td>
+                  <td><span class="badge bg-primary">{{ order.p_quantity }}</span></td>
+                  <td>₹{{ order.p_price }}</td>
+                  <td class="fw-bold">₹{{ order.p_price|add:order.p_quantity }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- PRICING BREAKDOWN -->
+          <hr>
+          <div class="row mb-3">
+            <div class="col-6">Subtotal:</div>
+            <div class="col-6 text-end">₹{{ total_amount }}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-6">Shipping:</div>
+            <div class="col-6 text-end"><span class="text-success">FREE</span></div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-6">Tax (18%):</div>
+            <div class="col-6 text-end">₹{{ total_amount|floatformat:0 }}</div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-6 fw-bold">Total Amount:</div>
+            <div class="col-6 text-end">
+              <h5 class="text-primary fw-bold">
+                ₹{{ total_amount|add:total_amount|floatformat:0 }}
+              </h5>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DELIVERY INFO -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-light">
+          <h6 class="mb-0">
+            <i class="bi bi-truck"></i> Delivery Information
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">Delivering To</h6>
+              <p>
+                <strong>{{ customer.fname }} {{ customer.lname }}</strong><br>
+                {{ customer.email }}
+              </p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">Estimated Delivery</h6>
+              <p class="text-success fw-bold">
+                <i class="bi bi-calendar"></i> 2-3 Business Days
+              </p>
+            </div>
+          </div>
+
+          <div class="alert alert-info mb-0">
+            <i class="bi bi-info-circle"></i>
+            <strong>Status:</strong> Your order has been confirmed and will be processed shortly.
+            You'll receive tracking updates via email.
+          </div>
+        </div>
+      </div>
+
+      <!-- NEXT STEPS -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-light">
+          <h6 class="mb-0">
+            <i class="bi bi-list-check"></i> What's Next?
+          </h6>
+        </div>
+        <div class="card-body">
+          <ol class="mb-0">
+            <li class="mb-2">
+              <strong>Order Confirmation:</strong> Check your email for order confirmation
+            </li>
+            <li class="mb-2">
+              <strong>Processing:</strong> Your order will be processed within 24 hours
+            </li>
+            <li class="mb-2">
+              <strong>Shipping:</strong> You'll receive tracking information once shipped
+            </li>
+            <li>
+              <strong>Delivery:</strong> Expected delivery within 2-3 business days
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- ACTION BUTTONS -->
+      <div class="d-grid gap-2">
+        <a href="{% url 'user:home' %}" class="btn btn-primary btn-lg">
+          <i class="bi bi-shop"></i> Continue Shopping
+        </a>
+        <a href="{% url 'view_orders' %}" class="btn btn-outline-secondary btn-lg">
+          <i class="bi bi-list-ul"></i> View All Orders
+        </a>
+      </div>
+
+      <!-- SUPPORT -->
+      <div class="alert alert-light mt-4 text-center">
+        <p class="mb-2">Need help?</p>
+        <p class="mb-0">
+          <i class="bi bi-telephone"></i> Contact us at support@trolleymate.com or
+          <i class="bi bi-chat-dots"></i> Chat with us on WhatsApp
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

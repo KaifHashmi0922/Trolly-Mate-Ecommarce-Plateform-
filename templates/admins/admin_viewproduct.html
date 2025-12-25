@@ -1,0 +1,289 @@
+{% extends "admins/dashbord.html" %}
+{% load static %}
+
+{% block show %}
+<div class="container-fluid mt-4">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold mb-1">
+        <i class="bi bi-boxes me-2 text-primary"></i>Products Management
+      </h3>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item">
+            <a href="/admins/dashbord/" class="text-decoration-none">
+              <i class="bi bi-house-door me-1"></i>Dashboard
+            </a>
+          </li>
+          <li class="breadcrumb-item active">
+            <i class="bi bi-box-seam me-1"></i>All Products
+          </li>
+        </ol>
+      </nav>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="/admins/add_product/" class="btn btn-primary btn-lg shadow-sm">
+        <i class="bi bi-plus-circle me-2"></i>Add Product
+      </a>
+    </div>
+  </div>
+
+  <!-- ✅ FIXED Stats Cards - NO INVALID FILTERS! -->
+  <div class="row mb-4 g-3">
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="bi bi-boxes fs-1 text-primary mb-2"></i>
+          <h3 class="fw-bold text-primary">{{ prods|length|default:0 }}</h3>
+          <p class="mb-0 text-muted">Total Products</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="bi bi-check-circle fs-1 text-success mb-2"></i>
+          <h3 class="fw-bold text-success">{{ prods|length|default:0 }}</h3>
+          <p class="mb-0 text-muted">Active</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="bi bi-x-circle fs-1 text-danger mb-2"></i>
+          <h3 class="fw-bold text-danger">0</h3>
+          <p class="mb-0 text-muted">Inactive</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="bi bi-currency-rupee fs-1 text-warning mb-2"></i>
+          <h3 class="fw-bold text-warning">₹0</h3>
+          <p class="mb-0 text-muted">Total Value</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advanced Search & Filter -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body p-4">
+      <div class="row g-3 align-items-end">
+        <div class="col-lg-3">
+          <label class="form-label fw-semibold">Search Products</label>
+          <input type="text" class="form-control form-control-lg" placeholder="Product name...">
+        </div>
+        <div class="col-lg-2">
+          <label class="form-label fw-semibold">Status</label>
+          <select class="form-select form-select-lg">
+            <option>All</option>
+            <option>Active</option>
+            <option>Inactive</option>
+          </select>
+        </div>
+        <div class="col-lg-2">
+          <label class="form-label fw-semibold">Category</label>
+          <select class="form-select form-select-lg">
+            <option>All Categories</option>
+            <option>Electronics</option>
+            <option>Clothing</option>
+          </select>
+        </div>
+        <div class="col-lg-3">
+          <label class="form-label fw-semibold">Price Range</label>
+          <select class="form-select form-select-lg">
+            <option>All Prices</option>
+            <option>₹0 - ₹500</option>
+            <option>₹500 - ₹2000</option>
+            <option>₹2000+</option>
+          </select>
+        </div>
+        <div class="col-lg-2">
+          <button class="btn btn-primary w-100 btn-lg">Filter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products DataTable -->
+  <div class="card shadow-lg border-0 overflow-hidden">
+    <div class="card-header bg-gradient-primary text-white p-4 d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 fw-bold">
+        <i class="bi bi-table me-2"></i>Products List
+      </h5>
+      <div class="d-flex gap-2">
+        <button class="btn btn-light btn-sm">
+          <i class="bi bi-file-excel"></i> Export
+        </button>
+        <button class="btn btn-outline-light btn-sm">
+          <i class="bi bi-printer"></i> Print
+        </button>
+      </div>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-dark table-group-divider">
+          <tr>
+            <th scope="col" class="fw-bold">ID</th>
+            <th scope="col" class="fw-bold">Product</th>
+            <th scope="col" class="fw-bold">Image</th>
+            <th scope="col" class="fw-bold">Company</th>
+            <th scope="col" class="fw-bold">Price</th>
+            <th scope="col" class="fw-bold">Stock</th>
+            <th scope="col" class="fw-bold">Status</th>
+            <th scope="col" class="fw-bold">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="table-group-divider">
+          {% for p in prods %}
+          <tr class="hover-shadow">
+            <th scope="row" class="fw-semibold">{{ p.id }}</th>
+            <td>
+              <div>
+                <h6 class="mb-1 fw-semibold">{{ p.name|truncatechars:25 }}</h6>
+                <small class="text-muted">{{ p.des|truncatechars:50 }}</small>
+              </div>
+            </td>
+            <td>
+              <div class="product-img-container">
+                <img src="{{ p.image.url|default:'/static/images/no-image.png' }}" 
+                     alt="{{ p.name }}" 
+                     class="img-fluid rounded shadow-sm"
+                     style="width: 60px; height: 60px; object-fit: cover;">
+              </div>
+            </td>
+            <td>
+              <span class="badge bg-info text-dark fs-6">{{ p.category|default:"—" }}</span>
+            </td>
+            <td>
+              <div class="fw-bold text-primary fs-5">₹{{ p.price|floatformat:0 }}</div>
+              <small class="text-muted">{{ p.price|floatformat:0 }} total</small>
+            </td>
+            <td>
+              {% if p.quantity > 10 %}
+                <span class="badge bg-success fs-6">{{ p.quantity }} Units</span>
+              {% elif p.quantity > 0 %}
+                <span class="badge bg-warning text-dark fs-6">{{ p.quantity }} Low</span>
+              {% else %}
+                <span class="badge bg-danger fs-6">Out of Stock</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if p.status %}
+                <span class="badge bg-success px-3 py-2">
+                  <i class="bi bi-check-circle me-1"></i>Active
+                </span>
+              {% else %}
+                <span class="badge bg-secondary px-3 py-2">
+                  <i class="bi bi-x-circle me-1"></i>Inactive
+                </span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="btn-group btn-group-sm" role="group">
+                <a href="/admins/product_edit/{{ p.id }}" 
+                   class="btn btn-outline-primary tooltip-btn" 
+                   title="Edit Product">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="/admins/product_soft/{{ p.id }}" 
+                   class="btn btn-outline-warning tooltip-btn" 
+                   title="Soft Delete">
+                  <i class="bi bi-eye-slash"></i>
+                </a>
+                <a href="/admins/product_delete/{{ p.id }}" 
+                   class="btn btn-outline-danger tooltip-btn" 
+                   title="Hard Delete"
+                   onclick="return confirm('Delete {{ p.name }}?')">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="text-center py-5">
+              <i class="bi bi-boxes display-1 text-muted mb-3"></i>
+              <h5 class="text-muted">No products found</h5>
+              <a href="/admins/add_product/" class="btn btn-primary mt-2">
+                Add your first product
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="card-footer bg-light border-0 py-3">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="text-muted small">
+          Showing {{ prods|length|default:0 }} products
+        </div>
+        <nav>
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item">
+              <a class="page-link" href="#">Previous</a>
+            </li>
+            <li class="page-item active">
+              <a class="page-link" href="#">1</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">Next</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Modern Table Styles */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%) !important;
+}
+.table-hover tr:hover { 
+  transform: scale(1.01); 
+  transition: all 0.2s ease; 
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.product-img-container { 
+  border-radius: 12px; 
+  overflow: hidden; 
+}
+.btn-group .btn { 
+  border-radius: 8px !important; 
+}
+.tooltip-btn:hover { 
+  transform: scale(1.1); 
+}
+.card { 
+  border-radius: 20px !important; 
+}
+.table th { 
+  border-top: none !important; 
+}
+.hover-shadow:hover { 
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1); 
+}
+</style>
+
+<script>
+// Tooltips & Confirmations
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize tooltips
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('.tooltip-btn'));
+  tooltipTriggerList.map(function(tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+});
+</script>
+
+{% endblock show %}

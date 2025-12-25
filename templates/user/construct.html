@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Trollymate | Notification</title>
+
+  <!-- Favicons -->
+  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700|Poppins:300,400,500,600,700" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
+
+  <style>
+    :root {
+      --admin-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --admin-card: rgba(255,255,255,0.96);
+      --admin-shadow: 0 20px 40px rgba(15,23,42,0.18);
+      --admin-glow: 0 0 30px rgba(129,140,248,0.5);
+    }
+    body {
+      background: var(--admin-bg);
+      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+    }
+    .tm-shell {
+      max-width: 720px;
+    }
+    .tm-card {
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: var(--admin-card);
+      box-shadow: var(--admin-shadow);
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+      position: relative;
+    }
+    .tm-card-header {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      padding: 1.5rem 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .tm-icon-circle {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 20px rgba(15,23,42,0.25);
+    }
+    .tm-card-body {
+      padding: 1.75rem 1.75rem 1.5rem;
+      text-align: center;
+    }
+    .tm-message {
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
+    .tm-sub {
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+    .tm-cta-btn {
+      border-radius: 999px;
+      font-weight: 600;
+      padding: 0.75rem 1.75rem;
+    }
+    .tm-hero-image {
+      width: 100%;
+      border-radius: 0 0 24px 24px;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <main id="main" class="w-100">
+    <div class="container tm-shell my-4">
+      <div class="tm-card">
+        <!-- Admin-style header -->
+        <div class="tm-card-header">
+          <div class="tm-icon-circle">
+            <i class="bi bi-info-circle-fill fs-4"></i>
+          </div>
+          <div class="text-start">
+            <h5 class="mb-0 fw-semibold">Trollymate Notification</h5>
+            <small class="text-white-50">Important information about your request</small>
+          </div>
+        </div>
+
+        <!-- Message block -->
+        <div class="tm-card-body">
+          <div id="textSlider" class="carousel slide mb-3" data-bs-ride="carousel" data-bs-interval="3500">
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                <h2 class="tm-message text-danger mb-2">{{ message }}</h2>
+              </div>
+            </div>
+          </div>
+          <p class="tm-sub mb-4">
+            If this was not expected, you can go back and try again or return to the home page.
+          </p>
+          <div class="d-flex justify-content-center gap-2 flex-wrap">
+            <a href="javascript:history.back()" class="btn btn-outline-secondary tm-cta-btn">
+              <i class="bi bi-arrow-left me-1"></i> Go Back
+            </a>
+            <a href="{% url 'index' %}" class="btn btn-primary tm-cta-btn">
+              <i class="bi bi-house-door me-1"></i> Home
+            </a>
+          </div>
+        </div>
+
+        <!-- Hero/banner image -->
+        <img src="{% static 'assets/img/Cons.png' %}"
+             class="tm-hero-image"
+             alt="Trollymate information">
+      </div>
+    </div>
+  </main>
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center">
+    <i class="bi bi-arrow-up-short"></i>
+  </a>
+
+  <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

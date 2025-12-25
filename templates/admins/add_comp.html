@@ -1,0 +1,143 @@
+{% extends "admins/dashbord.html" %}
+{% load static %}
+
+{% block show %}
+<!-- Dashboard Heading and Breadcrumb -->
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold mb-1">
+        <i class="bi bi-building-gear me-2 text-primary"></i>Register Company
+      </h3>
+      <nav>
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item">
+            <a href="/admins/dashbord/">
+              <i class="bi bi-house-door me-1"></i>Product Management
+            </a>
+          </li>
+          <li class="breadcrumb-item active">
+            <i class="bi bi-building me-1"></i>Register Company
+          </li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Alert Message (SAME LOGIC) -->
+  {% if message %}
+  <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <strong>{{ message }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endif %}
+
+  <!-- Modern Form Card -->
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-lg border-0 overflow-hidden">
+        <div class="card-header bg-gradient-primary text-white p-4 position-relative">
+          <h4 class="mb-0 fw-bold">
+            <i class="bi bi-plus-circle-fill me-2"></i>Add New Company
+          </h4>
+        </div>
+        
+        <div class="card-body p-5">
+          <!-- SAME FORM - Just Modern Styling -->
+          <form class="row g-4" method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <!-- Company Name -->
+            <div class="col-12">
+              <label class="form-label fw-semibold mb-2">
+                <i class="bi bi-building me-2 text-primary"></i>Company Name <span class="text-danger">*</span>
+              </label>
+              <input type="text" name="cname" class="form-control form-control-lg shadow-sm" required>
+            </div>
+
+            <!-- Category -->
+            <div class="col-12">
+              <label class="form-label fw-semibold mb-2">
+                <i class="bi bi-tags me-2 text-success"></i>Category <span class="text-danger">*</span>
+              </label>
+              <input type="text" name="category" class="form-control form-control-lg shadow-sm" required>
+            </div>
+
+            <!-- Product Types -->
+            <div class="col-12">
+              <label class="form-label fw-semibold mb-2">
+                <i class="bi bi-list-ul me-2 text-warning"></i>Product Types <span class="text-danger">*</span>
+              </label>
+              <textarea class="form-control shadow-sm" name="ptname" rows="4" required></textarea>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="col-12">
+              <label class="form-label fw-semibold mb-2">
+                <i class="bi bi-image me-2 text-info"></i>Company Image <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <input type="file" name="image" class="form-control form-control-lg shadow-sm" required>
+                <span class="input-group-text bg-light">
+                  <i class="bi bi-cloud-upload"></i>
+                </span>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="col-12">
+              <button class="btn btn-primary btn-lg w-100 shadow-lg px-5 py-3" type="submit">
+                <i class="bi bi-check-circle me-2"></i>Add Company
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Modern GUI Only - No Backend Changes */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%) !important;
+}
+.card {
+  border-radius: 20px !important;
+}
+.form-control, .form-control-lg {
+  border-radius: 12px;
+  border: 2px solid #e9ecef;
+  padding: 12px 16px;
+  transition: all 0.3s ease;
+}
+.form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.15);
+  transform: translateY(-1px);
+}
+.btn-primary {
+  background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 14px 28px;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(13,110,253,0.4);
+}
+.input-group-text {
+  border-radius: 0 12px 12px 0;
+}
+.breadcrumb-item a {
+  color: #6c757d;
+  text-decoration: none;
+}
+.breadcrumb-item.active {
+  color: #0d6efd;
+  font-weight: 500;
+}
+</style>
+{% endblock show %}

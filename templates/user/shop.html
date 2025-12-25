@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+{% load static %}
+{% load my_filter %}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Dashboard - Trolly Mate</title>
+  
+  <!-- Favicons -->
+  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Nunito|Poppins" rel="stylesheet">
+  
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/quill/quill.snow.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/quill/quill.bubble.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/remixicon/remixicon.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/simple-datatables/style.css' %}" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
+</head>
+<body>
+
+<!-- Header -->
+<header id="header" class="header fixed-top d-flex align-items-center">
+  <div class="d-flex align-items-center justify-content-between">
+    <a href="index.html" class="logo d-flex align-items-center">
+      <img src="{% static 'assets/img/logo.png' %}" alt="">
+      <span class="d-none d-lg-block">Trolly Mate</span>
+    </a>
+  </div>
+
+  <div class="search-bar">
+    <form class="search-form d-flex align-items-center" method="GET" action="{% url 'searchbar' %}">
+      <input type="text" name="query" placeholder="Search" title="Enter search keyword">
+      <button type="submit" title="Search"><i class="bi bi-search"></i></button>
+    </form>
+  </div>
+
+  <nav class="header-nav ms-auto">
+    <ul class="d-flex align-items-center">
+      {% if request.session.cust_id %}
+        <li class="nav-item dropdown pe-3">
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#">
+            <img src="{% static 'a' %}" height="50px" alt="" class="img-fluid rounded-circle mx-2">
+            {{ request.session.cust_name }}
+          </a>
+        </li>
+        <li>
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#">Cart</a>
+        </li>
+        <li>
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="/logout/">Logout</a>
+        </li>
+      {% else %}
+        <li>
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="{% url 'login' %}">
+            <img src="{% static 'assets/img/guest.png' %}" height=40 alt="Profile" class="rounded-circle">
+            Guest
+          </a>
+        </li>
+        <li>
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="{% url 'login' %}">Login</a>
+        </li>
+        <li>
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="/signup/">Sign Up</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+</header>
+
+<!-- Main Content -->
+<div class="container-fluid my-5">
+  <div class="row">
+    {% block cust_show %}{% endblock cust_show %}
+    <div class="col-lg-3">
+      <div class="row my-5">
+        {% for p in prods %}
+          <div class="card-group">
+            <div class="card">
+              <img src="{{ p.image.url }}" class="rounded w-100 h-50" alt="image">
+              <div class="card-body">
+                <h5 class="card-title">{{ p.name|title }}</h5>
+                <p class="card-text">{{ p.price|Currency }}</p>
+                <small class="text-body-secondary">{{ p.des }}</small>
+              </div>
+              <div class="card-footer">
+                <form action="/#" method="post">{% csrf_token %}
+                  <input type="hidden" name="addcart" value="{{ p.id }}">
+                  <input type="submit" class="btn btn-warning w-100" value="Add To Cart">
+                </form>
+                <form action="/#" method="post">{% csrf_token %}
+                  <input type="hidden" name="bynow" value="{{ p.id }}">
+                  <input type="submit" class="btn btn-danger w-100" value="Buy Now">
+                </form>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer id="footer" class="footer">
+  <div class="copyright">&copy; Copyright <strong><span>Trolly Mate</span></strong>. All Rights Reserved</div>
+  <div class="credits">Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a></div>
+</footer>
+
+<!-- Vendor JS Files -->
+<script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/vendor/quill/quill.js' %}"></script>
+<script src="{% static 'assets/vendor/simple-datatables/simple-datatables.js' %}"></script>
+<script src="{% static 'assets/js/main.js' %}"></script>
+
+</body>
+</html>

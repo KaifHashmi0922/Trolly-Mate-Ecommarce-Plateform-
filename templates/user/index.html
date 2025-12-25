@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+{% load static %}
+{% load my_filter %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Trolly Mate - Your Shopping Destination</title>
+    <meta content="Premium e-commerce platform for all your shopping needs" name="description">
+    <meta content="shopping, products, trollymate" name="keywords">
+
+    <!-- Favicons -->
+    <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+    <link href="{% static 'assets/img/apple-touch-icon-2.png' %}" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Pastel Blue/Indigo Admin Palette */
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --secondary-color: #f59e0b;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-md: 0 12px 30px rgba(0,0,0,0.12);
+            --shadow-lg: 0 25px 50px rgba(15,23,42,0.15);
+            --admin-bg: radial-gradient(circle at top, #e5f0ff 0%, #c7ddff 35%, #a5b4fc 70%, #818cf8 100%);
+        }
+
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+
+            body {
+            font-family: 'Poppins', 'Nunito', 'Open Sans', sans-serif;
+            background: var(--admin-bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            /* padding-top: 90px;  <-- REMOVE this line */
+                }
+
+
+        /* ========== PREMIUM NAVBAR ========== */
+        .header {
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(25px);
+            box-shadow: var(--shadow-md);
+            padding: 1.2rem 0;
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+            border-bottom: 1px solid rgba(226,232,240,0.8);
+            position: sticky;
+            top: 0;
+            width: 100%;
+        }
+
+        .header.scrolled {
+            background: rgba(255,255,255,1);
+            padding: 0.8rem 0;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .header .logo {
+            font-size: 1.9rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+            position: relative;
+            letter-spacing: -0.5px;
+            margin-left: 1.5rem;
+        }
+
+        .header .logo::before {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            width: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+            border-radius: 2px;
+            transition: all 0.4s ease;
+            transform: translateX(-50%);
+        }
+
+        .header .logo:hover::before {
+            width: 80px;
+        }
+
+        .header .logo img {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            border: 3px solid rgba(37,99,235,0.2);
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 25px rgba(37,99,235,0.2);
+        }
+
+        .header .logo:hover img {
+            transform: scale(1.08) rotate(5deg);
+            border-color: var(--primary-color);
+            box-shadow: 0 15px 35px rgba(37,99,235,0.4);
+        }
+
+        /* Enhanced Search Bar */
+        .search-bar {
+            flex: 1;
+            margin: 0 2.5rem;
+            max-width: 500px;
+        }
+
+        .search-form {
+            background: rgba(255,255,255,0.92);
+            border-radius: 30px;
+            padding: 12px 24px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .search-form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(37,99,235,0.05), transparent);
+            transition: width 0.6s ease;
+        }
+
+        .search-form:focus-within {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-3px) scale(1.02);
+            border-color: var(--primary-color);
+        }
+
+        .search-form:focus-within::before {
+            width: 100%;
+        }
+
+        .search-form input {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            padding: 14px 0;
+            font-size: 1rem;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .search-form input::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .search-form button {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border: none;
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(37,99,235,0.3);
+        }
+
+        .search-form button:hover {
+            transform: scale(1.1) rotate(360deg);
+            box-shadow: 0 12px 30px rgba(37,99,235,0.5);
+        }
+
+        .search-form button:active {
+            transform: scale(0.95);
+        }
+
+        /* Premium Navigation */
+        .header-nav {
+            display: flex;
+            gap: 1.75rem;
+            margin-right: 2rem;
+        }
+
+        .header-nav ul {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin: 0;
+        }
+
+        .header-nav .nav-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+            color: var(--text-dark);
+            padding: 0.75rem 1.5rem;
+            border-radius: 20px;
+            position: relative;
+            font-weight: 600;
+            font-size: 0.95rem;
+            overflow: hidden;
+            gap: 0.5rem;
+        }
+
+        .header-nav .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            transition: width 0.4s ease;
+            z-index: -1;
+        }
+
+        .header-nav .nav-link:hover::before {
+            width: 100%;
+        }
+
+        .header-nav .nav-link:hover {
+            color: white !important;
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(37,99,235,0.3);
+        }
+
+        .header-nav img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 3px solid var(--border-color);
+            object-fit: cover;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .header-nav img:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 12px 30px rgba(37,99,235,0.4);
+        }
+
+        /* Cart Badge */
+        .cart-link {
+            position: relative;
+        }
+
+            .cart-badge {
+            position: absolute;
+            top: 3px;      /* was -10px */
+            right: 5px;    /* was -12px */
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            color: white;
+            border-radius: 50%;
+            width: 22px;    /* optional: was 28px */
+            height: 22px;   /* optional: was 28px */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            box-shadow: 0 4px 15px rgba(239,68,68,0.4);
+            border: 2px solid white;
+        }
+
+
+        @keyframes badgeBounce {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .cart-badge:hover {
+            animation: badgeWiggle 0.5s ease;
+        }
+
+        @keyframes badgeWiggle {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-10deg) scale(1.05); }
+            75% { transform: rotate(10deg) scale(1.05); }
+        }
+
+                /* Products Grid */
+                .products-container {
+            padding: 5rem 0;
+            min-height: calc(100vh - 90px);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2.5rem;
+            padding: 0 1.5rem;
+        }
+
+        @media (min-width: 1200px) {
+            .products-grid { 
+                grid-template-columns: repeat(4, 1fr); 
+                padding: 0 3rem; 
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1199px) {
+            .products-grid { 
+                grid-template-columns: repeat(3, 1fr); 
+                padding: 0 2rem; 
+            }
+        }
+
+        @media (max-width: 767px) {
+            .products-grid { 
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 1.5rem;
+                padding: 0 1rem; 
+            }
+        }
+
+        /* Product Card - Enhanced Animation */
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border: 1px solid var(--border-color);
+            position: relative;
+            animation: slideInUp 0.6s ease forwards;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .product-card:nth-child(1) { animation-delay: 0.05s; }
+        .product-card:nth-child(2) { animation-delay: 0.1s; }
+        .product-card:nth-child(3) { animation-delay: 0.15s; }
+        .product-card:nth-child(4) { animation-delay: 0.2s; }
+        .product-card:nth-child(n+5) { animation-delay: 0.25s; }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+            opacity: 0;
+            transform: scaleX(0);
+            transition: all 0.4s ease;
+            transform-origin: left;
+        }
+
+        .product-card:hover::before {
+            opacity: 1;
+            transform: scaleX(1);
+        }
+
+        .product-card:hover {
+            box-shadow: 0 40px 80px rgba(37,99,235,0.25);
+            transform: translateY(-16px) scale(1.02);
+        }
+
+        /* Product Image */
+        .product-image-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--light-bg), #f1f5f9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .product-image-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent, rgba(37,99,235,0.05));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .product-card:hover .product-image-wrapper::after {
+            opacity: 1;
+        }
+
+        .product-image-wrapper img {
+            width: 85%;
+            height: 85%;
+            object-fit: contain;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .product-card:hover .product-image-wrapper img {
+            transform: scale(1.15) rotate(3deg);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            z-index: 10;
+            animation: badgePulse 2.5s ease-in-out infinite;
+            box-shadow: 0 8px 20px rgba(245,158,11,0.3);
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 8px 20px rgba(245,158,11,0.3);
+            }
+            50% { 
+                transform: scale(1.08);
+                box-shadow: 0 12px 30px rgba(245,158,11,0.5);
+            }
+        }
+
+        /* Product Details */
+        .product-details {
+            padding: 1.75rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+            transition: color 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-card:hover .product-title {
+            color: var(--primary-color);
+        }
+
+        .product-description {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 1.2rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Product Actions */
+        .product-actions {
+            padding: 0 1.75rem 1.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+
+        .btn-action {
+            padding: 0.95rem 1.5rem;
+            border: none;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn-action:hover::before {
+            left: 100%;
+        }
+
+        .btn-add-cart {
+            background: linear-gradient(135deg, var(--secondary-color), #f97316);
+            color: white;
+            box-shadow: 0 8px 20px rgba(245,158,11,0.3);
+        }
+
+        .btn-add-cart:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 16px 40px rgba(245,158,11,0.5);
+        }
+
+        .btn-add-cart:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn-buy-now {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: 0 8px 20px rgba(37,99,235,0.3);
+        }
+
+        .btn-buy-now:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 16px 40px rgba(37,99,235,0.5);
+        }
+
+        .btn-buy-now:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        /* Quantity Controls */
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 1.2rem;
+            padding: 0.75rem;
+            background: rgba(37,99,235,0.08);
+            border-radius: 25px;
+            border: 2px solid rgba(37,99,235,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .quantity-controls:hover {
+            background: rgba(37,99,235,0.12);
+            border-color: var(--primary-color);
+        }
+
+        .qty-btn {
+            padding: 0.75rem;
+            border: none;
+            border-radius: 50%;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-size: 1.1rem;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .qty-minus {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            color: white;
+        }
+
+        .qty-plus {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+        }
+
+        .qty-btn:hover {
+            transform: scale(1.15) rotate(180deg);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+        }
+
+        .qty-btn:active {
+            transform: scale(1.05) rotate(180deg);
+        }
+
+        .qty-display {
+            flex: 1;
+            text-align: center;
+            font-weight: 700;
+            padding: 0.75rem 1rem;
+            border: 2px solid transparent;
+            border-radius: 20px;
+            background: white;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 50vh;
+            padding: 3rem;
+            color: var(--text-muted);
+            animation: fadeInDown 0.8s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .empty-state-icon {
+            font-size: 6rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.5;
+            animation: floatBounce 3s ease-in-out infinite;
+        }
+
+        @keyframes floatBounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Back to Top */
+        .back-to-top {
+            position: fixed;
+            visibility: hidden;
+            opacity: 0;
+            right: 2rem;
+            bottom: 2rem;
+            z-index: 996;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-size: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-8px) scale(1.15);
+            box-shadow: 0 20px 50px rgba(37,99,235,0.5);
+        }
+
+        .back-to-top.active {
+            visibility: visible;
+            opacity: 1;
+            animation: slideUpPulse 0.6s ease;
+        }
+
+        @keyframes slideUpPulse {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .back-to-top.active::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            animation: outerPulse 2s infinite;
+        }
+
+        @keyframes outerPulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .search-bar {
+                margin: 0 1rem;
+                max-width: 100%;
+            }
+            
+            .header-nav {
+                gap: 1rem;
+                margin-right: 1rem;
+            }
+            
+            .header-nav ul {
+                gap: 1rem;
+            }
+            
+            .header .logo {
+                font-size: 1.5rem;
+                margin-left: 1rem;
+            }
+            
+            .header .logo img {
+                width: 44px;
+                height: 44px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {% if request.session.cust_id %}
+        <!-- LOGGED IN USER HEADER -->
+        <header id="header" class="header fixed-top d-flex align-items-center">
+            <div class="container-fluid d-flex justify-content-between align-items-center">
+                <!-- Logo -->
+                <a href="{% url 'index' %}" class="logo d-flex align-items-center">
+                    <img src="{% static 'assets/img/apple-touch-icon-2.png' %}" alt="Trolly Mate">
+                    <span>Trolly Mate</span>
+                </a>
+
+                <!-- Search Bar -->
+                <div class="search-bar">
+                    <form class="search-form" method="GET" action="{% url 'query' %}">
+                        <input type="text" name="query" placeholder="{% if query %}{{ query }}{% else %}Search products...{% endif %}" title="Enter search keyword">
+                        <button type="submit" title="Search"><i class="bi bi-search"></i></button>
+                    </form>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="header-nav">
+                    <ul class="d-flex align-items-center gap-3">
+                        <li><a href="{% url 'cust_profile' %}" class="nav-link" title="Profile">
+                            {% if request.session.cust_image %}  
+                                <img src="{% static request.session.cust_image %}" alt="Profile">
+                            {% else %}
+                                <img src="{% static 'assets/img/guest.png' %}" alt="Profile">
+                            {% endif %}
+                        </a></li>
+                        <li>
+                            <a href="{% url 'cart' %}" class="nav-link cart-link" title="Shopping Cart">
+                                <img src="{% static 'assets/img/cartb.png' %}" alt="Cart">
+                                {% if request.session.cart %}
+                                    <span class="cart-badge">{{ request.session.cart|length }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+
+                        <li><a href="{% url 'logout' %}" class="nav-link" title="Logout">
+                            <img src="{% static 'assets/img/logout.png' %}" alt="Logout">
+                        </a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <!-- PRODUCTS SECTION -->
+        {% if request.session.cart %}
+            {% if status %}
+                <div class="products-container">
+                    <div class="products-grid">
+                        {% for p in prods %}
+                        <div class="product-card">
+                            <!-- Product Image -->
+                            <div class="product-image-wrapper">
+                                <img src="{{ p.image.url }}" alt="{{ p.name }}">
+                                <span class="product-badge">Featured</span>
+                            </div>
+
+                            <!-- Product Details -->
+                            <div class="product-details">
+                                <h3 class="product-title" title="{{ p.name }}">{{ p.name|title }}</h3>
+                                <p class="product-description" title="{{ p.des }}">{{ p.des|title }}</p>
+                                <div class="product-price"><span class="product-price-currency">₹</span>{{ p.price|Currency }}</div>
+
+                                <!-- Product Actions -->
+                                <div class="product-actions">
+                                    {% if p.quantity|get_item:request.session.cart %}
+                                    <div class="quantity-controls">
+                                        <form action="{% url 'cart_update' %}" method="POST" style="width: 40px;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="minus" value="{{ p.id }}">
+                                            <button type="submit" class="qty-btn qty-minus" title="Decrease Quantity"><i class="bi bi-dash"></i></button>
+                                        </form>
+                                        <div class="qty-display">{{ p|quantity:request.session.cart }}</div>
+                                        <form action="{% url 'cart_update' %}" method="POST" style="width: 40px;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="plus" value="{{ p.id }}">
+                                            <button type="submit" class="qty-btn qty-plus" title="Increase Quantity"><i class="bi bi-plus"></i></button>
+                                        </form>
+                                    </div>
+                                    <form action="{% url 'bynow' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="bynow" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
+                                    </form>
+                                    {% else %}
+                                    <form action="{% url 'cart_update' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="plus" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-add-cart"><i class="bi bi-cart-plus"></i>Add to Cart</button>
+                                    </form>
+                                    <form action="{% url 'bynow' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="bynow" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="products-container">
+                    <div class="products-grid">
+                        {% for p in prods %}
+                        <div class="product-card">
+                            <!-- Product Image -->
+                            <div class="product-image-wrapper">
+                                <img src="{{ p.image.url }}" alt="{{ p.name }}">
+                                <span class="product-badge">Featured</span>
+                            </div>
+
+                            <!-- Product Details -->
+                            <div class="product-details">
+                                <h3 class="product-title" title="{{ p.name }}">{{ p.name|title }}</h3>
+                                <p class="product-description" title="{{ p.des }}">{{ p.des|title }}</p>
+                                <div class="product-price"><span class="product-price-currency">₹</span>{{ p.price|Currency }}</div>
+
+                                <!-- Product Actions -->
+                                <div class="product-actions">
+                                    {% if p.quantity|get_item:request.session.cart %}
+                                    <div class="quantity-controls">
+                                        <form action="{% url 'cart_update' %}" method="POST" style="width: 40px;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="minus" value="{{ p.id }}">
+                                            <button type="submit" class="qty-btn qty-minus" title="Decrease Quantity"><i class="bi bi-dash"></i></button>
+                                        </form>
+                                        <div class="qty-display">{{ p|quantity:request.session.cart }}</div>
+                                        <form action="{% url 'cart_update' %}" method="POST" style="width: 40px;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="plus" value="{{ p.id }}">
+                                            <button type="submit" class="qty-btn qty-plus" title="Increase Quantity"><i class="bi bi-plus"></i></button>
+                                        </form>
+                                    </div>
+                                    <form action="{% url 'bynow' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="bynow" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
+                                    </form>
+                                    {% else %}
+                                    <form action="{% url 'cart_update' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="plus" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-add-cart"><i class="bi bi-cart-plus"></i>Add to Cart</button>
+                                    </form>
+                                    <form action="{% url 'bynow' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="bynow" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            {% if status %}
+                <div class="products-container">
+                    <div class="products-grid">
+                        {% for p in prods %}
+                        <div class="product-card">
+                            <!-- Product Image -->
+                            <div class="product-image-wrapper">
+                                <img src="{{ p.image.url }}" alt="{{ p.name }}">
+                                <span class="product-badge">Featured</span>
+                            </div>
+
+                            <!-- Product Details -->
+                            <div class="product-details">
+                                <h3 class="product-title" title="{{ p.name }}">{{ p.name|title }}</h3>
+                                <p class="product-description" title="{{ p.des }}">{{ p.des|title }}</p>
+                                <div class="product-price"><span class="product-price-currency">₹</span>{{ p.price|Currency }}</div>
+
+                                <!-- Product Actions -->
+                                <div class="product-actions">
+                                    <form action="{% url 'cart_update' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="plus" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-add-cart"><i class="bi bi-cart-plus"></i>Add to Cart</button>
+                                    </form>
+                                    <form action="{% url 'bynow' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="bynow" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="products-container">
+                    <div class="products-grid">
+                        {% for p in prods %}
+                        <div class="product-card">
+                            <!-- Product Image -->
+                            <div class="product-image-wrapper">
+                                <img src="{{ p.image.url }}" alt="{{ p.name }}">
+                                <span class="product-badge">Featured</span>
+                            </div>
+
+                            <!-- Product Details -->
+                            <div class="product-details">
+                                <h3 class="product-title" title="{{ p.name }}">{{ p.name|title }}</h3>
+                                <p class="product-description" title="{{ p.des }}">{{ p.des|title }}</p>
+                                <div class="product-price"><span class="product-price-currency">₹</span>{{ p.price|Currency }}</div>
+
+                                <!-- Product Actions -->
+                                <div class="product-actions">
+                                    <form action="{% url 'cart_update' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="plus" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-add-cart"><i class="bi bi-cart-plus"></i>Add to Cart</button>
+                                    </form>
+                                    <form action="{% url 'bynow' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="bynow" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+
+    {% else %}
+        <!-- GUEST USER HEADER -->
+        <header id="header" class="header fixed-top d-flex align-items-center">
+            <div class="container-fluid d-flex justify-content-between align-items-center">
+                <!-- Logo -->
+                <a href="{% url 'index' %}" class="logo d-flex align-items-center">
+                    <img src="{% static 'assets/img/apple-touch-icon-2.png' %}" alt="Trolly Mate">
+                    <span>Trolly Mate</span>
+                </a>
+
+                <!-- Search Bar -->
+                <div class="search-bar">
+                    <form class="search-form" method="GET" action="{% url 'query' %}">
+                        <input type="text" name="query" placeholder="{% if query %}{{ query }}{% else %}Search products...{% endif %}" title="Enter search keyword">
+                        <button type="submit" title="Search"><i class="bi bi-search"></i></button>
+                    </form>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="header-nav">
+                    <ul class="d-flex align-items-center gap-3">
+                        <li><a href="{% url 'login' %}" class="nav-link" title="Login">
+                            <img src="{% static 'assets/img/guest.png' %}" alt="Guest">
+                        </a></li>
+                    <li>
+                    <a href="{% url 'cart' %}" class="nav-link cart-link" title="Shopping Cart">
+                        <img src="{% static 'assets/img/cartb.png' %}" alt="Cart">
+                        {% if request.session.cart %}
+                            <span class="cart-badge">{{ request.session.cart|length }}</span>
+                        {% endif %}
+                    </a>
+                   </li>
+
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <!-- GUEST PRODUCTS SECTION -->
+        {% if request.session.cart %}
+            {% if status %}
+                <div class="products-container">
+                    <div class="products-grid">
+                        {% for p in prods %}
+                        <div class="product-card">
+                            <!-- Product Image -->
+                            <div class="product-image-wrapper">
+                                <img src="{{ p.image.url }}" alt="{{ p.name }}">
+                                <span class="product-badge">Featured</span>
+                            </div>
+
+                            <!-- Product Details -->
+                            <div class="product-details">
+                                <h3 class="product-title" title="{{ p.name }}">{{ p.name|title }}</h3>
+                                <p class="product-description" title="{{ p.des }}">{{ p.des|title }}</p>
+                                <div class="product-price"><span class="product-price-currency">₹</span>{{ p.price|Currency }}</div>
+
+                                <!-- Product Actions -->
+                                <div class="product-actions">
+                                    {% if p.quantity|get_item:request.session.cart %}
+                                    <div class="quantity-controls">
+                                        <form action="{% url 'cart_update' %}" method="POST" style="width: 40px;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="minus" value="{{ p.id }}">
+                                            <button type="submit" class="qty-btn qty-minus" title="Decrease Quantity"><i class="bi bi-dash"></i></button>
+                                        </form>
+                                        <div class="qty-display">{{ p|quantity:request.session.cart }}</div>
+                                        <form action="{% url 'cart_update' %}" method="POST" style="width: 40px;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="plus" value="{{ p.id }}">
+                                            <button type="submit" class="qty-btn qty-plus" title="Increase Quantity"><i class="bi bi-plus"></i></button>
+                                        </form>
+                                    </div>
+                                    <form action="{% url 'bynow' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="bynow" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
+                                    </form>
+                                    {% else %}
+                                    <form action="{% url 'cart_update' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="plus" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-add-cart"><i class="bi bi-cart-plus"></i>Add to Cart</button>
+                                    </form>
+                                    <form action="{% url 'bynow' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="bynow" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="products-container">
+                    <div class="products-grid">
+                        {% for p in prods %}
+                        <div class="product-card">
+                            <!-- Product Image -->
+                            <div class="product-image-wrapper">
+                                <img src="{{ p.image.url }}" alt="{{ p.name }}">
+                                <span class="product-badge">Featured</span>
+                            </div>
+
+                            <!-- Product Details -->
+                            <div class="product-details">
+                                <h3 class="product-title" title="{{ p.name }}">{{ p.name|title }}</h3>
+                                <p class="product-description" title="{{ p.des }}">{{ p.des|title }}</p>
+                                <div class="product-price"><span class="product-price-currency">₹</span>{{ p.price|Currency }}</div>
+
+                                <!-- Product Actions -->
+                                <div class="product-actions">
+                                    {% if p.quantity|get_item:request.session.cart %}
+                                    <div class="quantity-controls">
+                                        <form action="{% url 'cart_update' %}" method="POST" style="width: 40px;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="minus" value="{{ p.id }}">
+                                            <button type="submit" class="qty-btn qty-minus" title="Decrease Quantity"><i class="bi bi-dash"></i></button>
+                                        </form>
+                                        <div class="qty-display">{{ p|quantity:request.session.cart }}</div>
+                                        <form action="{% url 'cart_update' %}" method="POST" style="width: 40px;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="plus" value="{{ p.id }}">
+                                            <button type="submit" class="qty-btn qty-plus" title="Increase Quantity"><i class="bi bi-plus"></i></button>
+                                        </form>
+                                    </div>
+                                    <form action="{% url 'bynow' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="bynow" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
+                                    </form>
+                                    {% else %}
+                                    <form action="{% url 'cart_update' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="plus" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-add-cart"><i class="bi bi-cart-plus"></i>Add to Cart</button>
+                                    </form>
+                                    <form action="{% url 'bynow' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="bynow" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            {% if status %}
+                <div class="products-container">
+                    <div class="products-grid">
+                        {% for p in prods %}
+                        <div class="product-card">
+                            <!-- Product Image -->
+                            <div class="product-image-wrapper">
+                                <img src="{{ p.image.url }}" alt="{{ p.name }}">
+                                <span class="product-badge">Featured</span>
+                            </div>
+
+                            <!-- Product Details -->
+                            <div class="product-details">
+                                <h3 class="product-title" title="{{ p.name }}">{{ p.name|title }}</h3>
+                                <p class="product-description" title="{{ p.des }}">{{ p.des|title }}</p>
+                                <div class="product-price"><span class="product-price-currency">₹</span>{{ p.price|Currency }}</div>
+
+                                <!-- Product Actions -->
+                                <div class="product-actions">
+                                    <form action="{% url 'cart_update' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="plus" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-add-cart"><i class="bi bi-cart-plus"></i>Add to Cart</button>
+                                    </form>
+                                    <form action="{% url 'bynow' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="bynow" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="products-container">
+                    <div class="products-grid">
+                        {% for p in prods %}
+                        <div class="product-card">
+                            <!-- Product Image -->
+                            <div class="product-image-wrapper">
+                                <img src="{{ p.image.url }}" alt="{{ p.name }}">
+                                <span class="product-badge">Featured</span>
+                            </div>
+
+                            <!-- Product Details -->
+                            <div class="product-details">
+                                <h3 class="product-title" title="{{ p.name }}">{{ p.name|title }}</h3>
+                                <p class="product-description" title="{{ p.des }}">{{ p.des|title }}</p>
+                                <div class="product-price"><span class="product-price-currency">₹</span>{{ p.price|Currency }}</div>
+
+                                <!-- Product Actions -->
+                                <div class="product-actions">
+                                    <form action="{% url 'cart_update' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="plus" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-add-cart"><i class="bi bi-cart-plus"></i>Add to Cart</button>
+                                    </form>
+                                    <form action="{% url 'bynow' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="bynow" value="{{ p.id }}">
+                                        <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Scripts -->
+    <script src="{% static 'assets/vendor/apexcharts/apexcharts.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Back to Top Button Functionality
+        const backToTopButton = document.querySelector('.back-to-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('active');
+            } else {
+                backToTopButton.classList.remove('active');
+            }
+        });
+
+        backToTopButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Header Scroll Effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Stagger Animation on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.product-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.08}s`;
+            });
+        });
+
+        // Ripple Effect on Buttons
+        document.querySelectorAll('.btn-action, .qty-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                ripple.style.position = 'absolute';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.style.width = '20px';
+                ripple.style.height = '20px';
+                ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+                ripple.style.borderRadius = '50%';
+                ripple.style.pointerEvents = 'none';
+                ripple.style.animation = 'rippleAnimation 0.6s ease-out';
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Add ripple animation to style
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes rippleAnimation {
+                to {
+                    width: 200px;
+                    height: 200px;
+                    opacity: 0;
+                    transform: translate(-50%, -50%);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

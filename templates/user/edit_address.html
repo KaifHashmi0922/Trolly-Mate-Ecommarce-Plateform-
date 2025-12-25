@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Trollymate | Edit Address</title>
+    
+    <!-- Admin Assets -->
+    <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+    <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
+    
+    <style>
+        :root {
+            --admin-bg: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --admin-card: rgba(255,255,255,0.95);
+            --admin-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            --admin-glow: 0 0 20px rgba(16,185,129,0.3);
+        }
+        body {
+            background: var(--admin-bg);
+            font-family: 'Nunito', sans-serif;
+            min-height: 100vh;
+            padding-top: 2rem;
+        }
+        .admin-card {
+            backdrop-filter: blur(20px);
+            background: var(--admin-card);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 24px;
+            box-shadow: var(--admin-shadow);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        .admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--admin-glow);
+        }
+        .admin-title {
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            font-size: 2rem;
+        }
+        .admin-header {
+            background: linear-gradient(135deg, rgba(16,185,129,0.95), rgba(5,150,105,0.95));
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: 24px 24px 0 0;
+        }
+        .form-control {
+            border-radius: 16px;
+            border: 2px solid rgba(16,185,129,0.2);
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.8);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .form-control:focus {
+            border-color: #10b981;
+            box-shadow: var(--admin-glow);
+            background: white;
+            transform: translateY(-1px);
+        }
+        .admin-btn {
+            border-radius: 50px;
+            font-weight: 700;
+            padding: 14px 32px;
+            border: none;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        .btn-update {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        .btn-update:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--admin-glow);
+            color: white;
+        }
+        .btn-cancel {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .btn-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(107,114,128,0.4);
+            color: white;
+        }
+        .status-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(245,158,11,0.4);
+        }
+        .input-group-text {
+            border-radius: 16px 0 0 16px;
+            background: rgba(16,185,129,0.1);
+            border-color: rgba(16,185,129,0.2);
+            color: #10b981;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10 col-12">
+                <!-- Admin-style card with status badge -->
+                <div class="admin-card position-relative">
+                    <!-- Status Badge -->
+                    <div class="status-badge">
+                        <i class="bi bi-pencil-square"></i>
+                    </div>
+                    
+                    <!-- Header -->
+                    <div class="admin-header position-relative">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="bi bi-geo-alt-fill fs-4 me-2"></i>
+                                <h3 class="mb-1 fw-bold">Edit Delivery Address</h3>
+                                <p class="mb-0 opacity-90">Update details for this saved address</p>
+                            </div>
+                            <a href="{% url 'show_address' %}" class="btn btn-light btn-sm rounded-pill px-4">
+                                <i class="bi bi-arrow-left me-1"></i>Back
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Messages -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show m-4 mb-0" role="alert">
+                                <i class="bi bi-info-circle-fill me-2"></i>{{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Edit Form -->
+                    <form method="POST" class="needs-validation p-4" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Full Name -->
+                        <div class="mb-4">
+                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                                <input type="text" 
+                                       class="form-control form-control-lg" 
+                                       name="fullname" 
+                                       value="{{ address.fullname }}"
+                                       placeholder="John Doe"
+                                       required>
+                                <div class="invalid-feedback">Full name is required</div>
+                            </div>
+                        </div>
+
+                        <!-- Phone Numbers -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
+                                    <input type="tel" 
+                                           class="form-control form-control-lg" 
+                                           name="phone" 
+                                           value="{{ address.phone }}"
+                                           placeholder="9876543210"
+                                           pattern="[0-9]{10}"
+                                           maxlength="10"
+                                           required>
+                                    <div class="invalid-feedback">Enter valid 10-digit phone</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Alternate Phone</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-telephone-x"></i></span>
+                                    <input type="tel" 
+                                           class="form-control form-control-lg" 
+                                           name="alt_phone" 
+                                           value="{{ address.alt_phone }}"
+                                           placeholder="Optional number"
+                                           pattern="[0-9]{10}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location Details -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Pincode <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                                    <input type="text" 
+                                           class="form-control form-control-lg" 
+                                           name="pincode" 
+                                           value="{{ address.pincode }}"
+                                           placeholder="110001"
+                                           pattern="[0-9]{6}"
+                                           maxlength="6"
+                                           required>
+                                    <div class="invalid-feedback">Enter valid 6-digit pincode</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">City <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-building"></i></span>
+                                    <input type="text" 
+                                           class="form-control form-control-lg" 
+                                           name="city" 
+                                           value="{{ address.city }}"
+                                           placeholder="New Delhi"
+                                           required>
+                                    <div class="invalid-feedback">City is required</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- State & Country -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">State <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-map-fill"></i></span>
+                                    <input type="text" 
+                                           class="form-control form-control-lg" 
+                                           name="state" 
+                                           value="{{ address.state }}"
+                                           placeholder="Delhi"
+                                           required>
+                                    <div class="invalid-feedback">State is required</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Country <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                                    <input type="text" 
+                                           class="form-control form-control-lg" 
+                                           name="country" 
+                                           value="{{ address.country }}"
+                                           placeholder="India"
+                                           required>
+                                    <div class="invalid-feedback">Country is required</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- House & Area -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">House / Building <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-house-door"></i></span>
+                                    <input type="text" 
+                                           class="form-control form-control-lg" 
+                                           name="house" 
+                                           value="{{ address.house }}"
+                                           placeholder="Flat 101, Sunshine Apartments"
+                                           required>
+                                    <div class="invalid-feedback">House details required</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Area / Street <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                    <input type="text" 
+                                           class="form-control form-control-lg" 
+                                           name="area" 
+                                           value="{{ address.area }}"
+                                           placeholder="MG Road, Sector 14"
+                                           required>
+                                    <div class="invalid-feedback">Area/street required</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn admin-btn btn-update flex-fill fs-5 py-3">
+                                <i class="bi bi-check-circle-fill me-2"></i>Update Address
+                            </button>
+                            <a href="{% url 'show_address' %}" class="btn admin-btn btn-cancel flex-fill fs-5 py-3 text-center">
+                                <i class="bi bi-x-circle me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+        // Form validation + formatting
+        document.querySelector('.needs-validation').addEventListener('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            this.classList.add('was-validated');
+        });
+
+        // Phone & Pincode formatting
+        document.querySelectorAll('input[type="tel"]').forEach(input => {
+            input.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '').slice(0,10);
+            });
+        });
+
+        document.querySelector('input[name="pincode"]').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0,6);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container py-5">
+  <div class="row">
+    <!-- LEFT SIDE - ORDER ITEMS -->
+    <div class="col-lg-8">
+      <h3 class="mb-4">
+        <i class="bi bi-bag"></i> Order Summary ({{ total_items }} Items)
+      </h3>
+
+      <!-- LOW STOCK ALERTS -->
+      {% if low_stock_alerts %}
+      <div class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
+        <h6 class="mb-3">
+          <i class="bi bi-exclamation-triangle"></i> <strong>Stock Alerts</strong>
+        </h6>
+        {% for alert in low_stock_alerts %}
+        <div class="alert alert-{{ alert.type }} mb-2">
+          {{ alert.message }}
+        </div>
+        {% endfor %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endif %}
+
+      <!-- CART ITEMS TABLE -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Product</th>
+                <th>Company</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+                <th>Stock Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in products_with_stock %}
+              <tr>
+                <td>
+                  <strong>{{ item.order.p_name }}</strong>
+                </td>
+                <td>{{ item.product.company.name }}</td>
+                <td>
+                  <span class="badge bg-primary">{{ item.order.p_quantity }}</span>
+                </td>
+                <td>₹{{ item.order.p_price }}</td>
+                <td class="fw-bold">₹{{ item.order.p_price|add:item.order.p_quantity }}</td>
+                <td>
+                  <span class="badge bg-{{ item.stock_color }}">
+                    {{ item.stock_status }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CUSTOMER INFO -->
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-light">
+          <h6 class="mb-0">
+            <i class="bi bi-person"></i> Delivery Address
+          </h6>
+        </div>
+        <div class="card-body">
+          <p class="mb-2">
+            <strong>{{ customer.fname }} {{ customer.lname }}</strong>
+          </p>
+          <p class="mb-2">
+            <i class="bi bi-envelope"></i> {{ customer.email }}
+          </p>
+          <p class="mb-0">
+            <i class="bi bi-telephone"></i> {{ customer.phone|default:"Not Provided" }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE - PRICE SUMMARY -->
+    <div class="col-lg-4">
+      <!-- PRICE BREAKDOWN -->
+      <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+        <div class="card-header bg-primary text-white">
+          <h6 class="mb-0">
+            <i class="bi bi-calculator"></i> Order Total
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-3">
+            <span>Subtotal</span>
+            <strong>₹{{ total_amount }}</strong>
+          </div>
+          <div class="d-flex justify-content-between mb-3">
+            <span>Shipping</span>
+            <strong class="text-success">FREE</strong>
+          </div>
+          <div class="d-flex justify-content-between mb-3">
+            <span>Tax (18%)</span>
+            <strong>₹{{ total_amount|add:"0.18"|floatformat:0 }}</strong>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between mb-4">
+            <h6>Total Amount</h6>
+            <h5 class="text-primary fw-bold">
+              ₹{{ total_amount|add:total_amount|floatformat:0 }}
+            </h5>
+          </div>
+
+          <!-- CHECKOUT BUTTON -->
+          <form method="POST" class="mb-3">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success btn-lg w-100">
+              <i class="bi bi-bag-check"></i> Place Order
+            </button>
+          </form>
+
+          <a href="{% url 'user:home' %}" class="btn btn-outline-secondary w-100">
+            <i class="bi bi-arrow-left"></i> Continue Shopping
+          </a>
+        </div>
+      </div>
+
+      <!-- PAYMENT INFO -->
+      <div class="card shadow-sm border-0 mt-3">
+        <div class="card-body">
+          <h6 class="mb-3">
+            <i class="bi bi-shield-check"></i> Payment Methods
+          </h6>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="payment" id="cod" checked>
+            <label class="form-check-label" for="cod">
+              Cash on Delivery (COD)
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="payment" id="card">
+            <label class="form-check-label" for="card">
+              Credit/Debit Card
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- DELIVERY INFO -->
+      <div class="card shadow-sm border-0 mt-3">
+        <div class="card-body">
+          <h6 class="mb-3">
+            <i class="bi bi-truck"></i> Delivery Info
+          </h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2">
+              <i class="bi bi-check-circle text-success"></i> Free delivery on orders > ₹500
+            </li>
+            <li class="mb-2">
+              <i class="bi bi-check-circle text-success"></i> 2-3 days delivery time
+            </li>
+            <li class="mb-2">
+              <i class="bi bi-check-circle text-success"></i> Easy returns within 7 days
+            </li>
+            <li>
+              <i class="bi bi-check-circle text-success"></i> 24/7 customer support
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

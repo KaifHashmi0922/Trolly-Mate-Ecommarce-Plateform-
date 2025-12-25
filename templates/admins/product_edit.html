@@ -1,0 +1,356 @@
+{% extends "admins/dashbord.html" %}
+{% load static %}
+
+{% block show %}
+<div class="container-fluid mt-4">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold mb-1">
+        <i class="bi bi-box-seam me-2 text-primary"></i>Edit Product
+      </h3>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item">
+            <a href="{% url 'dashbord' %}" class="text-decoration-none">
+              <i class="bi bi-house-door me-1"></i>Product Management
+            </a>
+          </li>
+          <li class="breadcrumb-item">
+            <a href="/admins/admins_viewproduct/" class="text-decoration-none">
+              <i class="bi bi-grid me-1"></i>Products
+            </a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">Edit Product</li>
+        </ol>
+      </nav>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="/admins/admins_viewproduct/" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Back to List
+      </a>
+    </div>
+  </div>
+
+  <!-- Product Preview Card -->
+  <div class="row mb-4">
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header bg-primary text-white py-3">
+          <h5 class="mb-0 fw-semibold">
+            <i class="bi bi-box me-2"></i>Product Preview
+          </h5>
+        </div>
+        <div class="card-body text-center p-4">
+          {% if rec.image %}
+          <div class="position-relative mb-3">
+            <img src="{{ rec.image.url }}" class="rounded shadow-lg img-fluid mx-auto" 
+                 style="max-height: 200px; object-fit: cover;" alt="{{rec.name}}">
+            <div class="position-absolute top-0 start-0 bg-primary bg-opacity-75 rounded-bottom p-1">
+              <span class="badge bg-white text-dark small fw-semibold">
+                {{ rec.quantity }} In Stock
+              </span>
+            </div>
+          </div>
+          {% else %}
+          <div class="bg-gradient-primary rounded mx-auto mb-3 d-flex align-items-center justify-content-center text-white" 
+               style="width: 200px; height: 200px; font-size: 3rem; font-weight: bold;">
+            {{rec.name.0|upper}}
+          </div>
+          {% endif %}
+          <h4 class="mb-1 fw-bold text-primary">{{rec.name}}</h4>
+          <h5 class="mb-2 text-success fw-bold">₹{{rec.price}}</h5>
+          <span class="badge bg-outline-success px-3 py-2">
+            <i class="bi bi-check-circle me-1"></i>
+            {% if rec.status %}Active{% else %}Inactive{% endif %}
+          </span>
+          <p class="text-muted mt-2 mb-0 small">{{rec.company}} - {{rec.category}}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-8">
+      <!-- Stats Cards -->
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="card shadow-sm border-0 bg-light h-100">
+            <div class="card-body text-center">
+              <i class="bi bi-currency-rupee display-6 text-success mb-2"></i>
+              <h3 class="fw-bold text-success">₹{{rec.price}}</h3>
+              <p class="mb-0 text-muted">Price</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card shadow-sm border-0 bg-light h-100">
+            <div class="card-body text-center">
+              <i class="bi bi-box-seam display-6 text-info mb-2"></i>
+              <h3 class="fw-bold text-info">{{rec.quantity}}</h3>
+              <p class="mb-0 text-muted">Stock</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card shadow-sm border-0 bg-light h-100">
+            <div class="card-body text-center">
+              <i class="bi bi-file-text display-6 text-primary mb-2"></i>
+              <h3 class="fw-bold text-primary">{{rec.des|wordcount}}</h3>
+              <p class="mb-0 text-muted">Description Words</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Form -->
+  <div class="card shadow-lg border-0">
+    <div class="card-header bg-gradient-primary text-white py-4">
+      <h4 class="mb-0 fw-semibold">
+        <i class="bi bi-gear-fill me-2"></i>Update Product Details
+      </h4>
+    </div>
+    <div class="card-body p-4">
+      {% if message %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endif %}
+
+      <form class="row g-4 needs-validation" novalidate method="POST" enctype="multipart/form-data" id="productForm">
+        {% csrf_token %}
+
+        <div class="col-lg-6">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-tag me-2 text-primary"></i>Product Name
+          </label>
+          <input type="text" name="name" value="{{ rec.name }}" class="form-control" 
+                 placeholder="Enter product name" required maxlength="100">
+          <div class="invalid-feedback">
+            Product name is required (max 100 characters).
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-currency-rupee me-2 text-success"></i>Price (₹)
+          </label>
+          <div class="input-group">
+            <span class="input-group-text">₹</span>
+            <input type="number" name="price" value="{{ rec.price }}" class="form-control" 
+                   placeholder="0.00" step="0.01" min="0" required>
+          </div>
+          <div class="invalid-feedback">
+            Enter a valid price (₹0.00+).
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-building me-2 text-info"></i>Company
+          </label>
+          <select class="form-select" name="company" required>
+            <option value="">Select Company</option>
+            {% for s in comp %}
+            <option value="{{ s.id }}" {% if rec.company_id == s.id %}selected{% endif %}>
+              {{ s.name }} <span class="text-muted">({{ s.category }})</span>
+            </option>
+            {% endfor %}
+          </select>
+          <div class="invalid-feedback">Please select a company.</div>
+        </div>
+
+        <div class="col-lg-6">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-box-seam me-2 text-warning"></i>Quantity
+          </label>
+          <input type="number" name="quantity" value="{{ rec.quantity }}" class="form-control" 
+                 placeholder="0" min="0" required>
+          <div class="invalid-feedback">
+            Enter stock quantity (0+).
+          </div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-card-text me-2 text-secondary"></i>Description
+          </label>
+          <textarea class="form-control" name="des" rows="4" placeholder="Enter product description..." 
+                    required maxlength="500">{{ rec.des }}</textarea>
+          <div class="form-text">Max 500 characters. Include features, specifications, and benefits.</div>
+          <div class="invalid-feedback">
+            Description is required (max 500 characters).
+          </div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-image me-2 text-danger"></i>Product Image
+          </label>
+          <div class="dropzone p-4 border border-dashed border-primary rounded-3 text-center" 
+               id="imageDropzone">
+            {% if rec.image %}
+            <div class="current-image mb-3">
+              <img src="{{ rec.image.url }}" class="rounded shadow-sm img-fluid" 
+                   style="max-height: 200px; max-width: 300px;" alt="Current Image">
+              <p class="text-muted small mt-2 mb-0">Current image (click to change)</p>
+            </div>
+            {% endif %}
+            <i class="bi bi-cloud-upload display-4 text-primary mb-3 d-block"></i>
+            <input type="file" name="image" class="form-control" accept="image/*" id="imageInput">
+            <label for="imageInput" class="form-label d-block mt-2 btn btn-outline-primary">
+              <i class="bi bi-upload me-2"></i>Choose New Image
+            </label>
+            <div class="form-text small">JPG, PNG, WebP (Max 3MB, Recommended 600x600px)</div>
+          </div>
+          <div class="invalid-feedback">
+            Please upload a valid image file.
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-toggle-on me-2 text-info"></i>Status
+          </label>
+          <select class="form-select" name="status" required>
+            <option value="" disabled>Select Status</option>
+            <option value="True" {% if rec.status %}selected{% endif %}>Active</option>
+            <option value="False" {% if not rec.status %}selected{% endif %}>Inactive</option>
+          </select>
+          <div class="form-text">Active products are visible to customers</div>
+          <div class="invalid-feedback">Please select a status.</div>
+        </div>
+
+        <div class="col-12">
+          <div class="d-flex gap-3 justify-content-end">
+            <a href="/admins/admins_viewproduct/" class="btn btn-outline-secondary">
+              <i class="bi bi-x-circle me-2"></i>Cancel
+            </a>
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="bi bi-check-circle me-2"></i>Update Product
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+.dropzone {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.dropzone:hover, .dropzone.dragover {
+  background-color: rgba(13,110,253,.05);
+  border-color: #0d6efd;
+  transform: translateY(-2px);
+}
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+}
+.form-control:focus, .form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.25rem rgba(13,110,253,.15);
+}
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('productForm');
+  const imageInput = document.getElementById('imageInput');
+  const dropzone = document.getElementById('imageDropzone');
+
+  // Client-side form validation
+  form.addEventListener('submit', function(e) {
+    if (!form.checkValidity()) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    form.classList.add('was-validated');
+  });
+
+  // Live price formatting
+  const priceInput = form.querySelector('input[name="price"]');
+  priceInput.addEventListener('input', function() {
+    let value = parseFloat(this.value);
+    if (isNaN(value)) value = 0;
+    this.value = value.toFixed(2);
+  });
+
+  // Image upload enhancements
+  function handleImageUpload(file) {
+    if (file && file.size > 3 * 1024 * 1024) {
+      alert('Image size must be less than 3MB');
+      return;
+    }
+    if (file && !file.type.startsWith('image/')) {
+      alert('Please upload a valid image file');
+      return;
+    }
+    
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.className = 'rounded shadow-sm img-fluid';
+        img.style.maxHeight = '200px';
+        img.style.maxWidth = '100%';
+        
+        const currentImg = dropzone.querySelector('.current-image img');
+        if (currentImg) {
+          currentImg.replaceWith(img);
+        } else {
+          const currentDiv = dropzone.querySelector('.current-image');
+          if (currentDiv) {
+            currentDiv.innerHTML = `<img src="${img.src}" class="rounded shadow-sm img-fluid" style="max-height: 200px; max-width: 300px;">`;
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  imageInput.addEventListener('change', function(e) {
+    handleImageUpload(e.target.files[0]);
+  });
+
+  // Drag & drop
+  dropzone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    dropzone.classList.add('dragover');
+  });
+
+  dropzone.addEventListener('dragleave', function() {
+    dropzone.classList.remove('dragover');
+  });
+
+  dropzone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      imageInput.files = files;
+      handleImageUpload(files[0]);
+    }
+  });
+
+  // Auto-resize textarea
+  const textarea = document.querySelector('textarea[name="des"]');
+  textarea.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+  });
+});
+</script>
+
+{% endblock show %}

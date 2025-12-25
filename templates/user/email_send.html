@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Trollymate | Password Reset OTP</title>
+
+    <!-- Admin Assets (Email-safe) -->
+    <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <style>
+        :root {
+            --admin-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --admin-card: rgba(255,255,255,0.98);
+            --admin-shadow: 0 20px 40px rgba(15,23,42,0.15);
+            --admin-glow: 0 0 25px rgba(102,126,234,0.3);
+        }
+        body {
+            background: var(--admin-bg);
+            font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .tm-shell {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .tm-card {
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: var(--admin-card);
+            box-shadow: var(--admin-shadow);
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+            position: relative;
+        }
+        .tm-header {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 2rem 1.75rem;
+            text-align: center;
+        }
+        .tm-otp-display {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border-radius: 20px;
+            padding: 2rem 1rem;
+            margin: 2rem 0;
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 800;
+            letter-spacing: 12px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(59,130,246,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .tm-otp-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        .tm-icon-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            backdrop-filter: blur(10px);
+        }
+        .tm-content {
+            padding: 2.5rem 2rem 2rem;
+            text-align: center;
+        }
+        .tm-footer {
+            background: rgba(102,126,234,0.1);
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            color: #64748b;
+        }
+        .status-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 8px 25px rgba(16,185,129,0.4);
+            z-index: 10;
+        }
+        @media (max-width: 576px) {
+            body { padding: 10px; }
+            .tm-content { padding: 1.5rem 1rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tm-shell">
+        <div class="tm-card position-relative">
+            <!-- Status Badge -->
+            <div class="status-badge">
+                <i class="bi bi-shield-check"></i>
+            </div>
+
+            <!-- Header -->
+            <div class="tm-header">
+                <div class="tm-icon-circle">
+                    <i class="bi bi-lock-fill fs-2"></i>
+                </div>
+                <h2 class="mb-1 fw-bold">Password Reset Request</h2>
+                <p class="lead mb-0 opacity-90">Secure verification code for {{ site_name }}</p>
+            </div>
+
+            <!-- Content -->
+            <div class="tm-content">
+                <p class="mb-4">
+                    Hello <strong style="color: #1e40af;">{{ user_name }}</strong>,
+                </p>
+                
+                <p class="mb-4">
+                    You requested to reset your password for <strong>{{ site_name }}</strong>. 
+                    Use the secure One Time Password (OTP) below within the next <strong>10 minutes</strong>.
+                </p>
+
+                <!-- OTP Display (Animated Shine Effect) -->
+                <div class="tm-otp-display">
+                    {{ otp_code }}
+                </div>
+
+                <div class="alert alert-info border-0 rounded-3 mb-4 shadow-sm">
+                    <i class="bi bi-clock-fill me-2"></i>
+                    <strong>OTP expires in 10 minutes</strong>. Do not share this code with anyone.
+                </div>
+
+                <p class="text-muted mb-0">
+                    If you did not request this password reset, please ignore this message. 
+                    Your account password will remain unchanged.
+                </p>
+            </div>
+
+            <!-- Footer -->
+            <div class="tm-footer">
+                <p class="mb-1">
+                    Thanks,<br>
+                    <strong>The {{ site_name }} Team</strong>
+                </p>
+                <p class="mb-0 small">
+                    &copy; {{ current_year }} {{ site_name }}. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

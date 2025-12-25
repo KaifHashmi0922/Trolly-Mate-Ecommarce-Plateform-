@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+{% load static %}
+{% load my_filter %}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Trollymate | Secure Payment</title>
+
+  <!-- Admin Assets -->
+  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* SAME background as new Order Summary */
+      --admin-bg: radial-gradient(circle at top,
+        #e5f0ff 0,
+        #c7ddff 35%,
+        #a5b4fc 70%,
+        #818cf8 100%);
+      --admin-card: #ffffff;
+      --admin-shadow: 0 16px 40px rgba(15,23,42,0.12);
+      --admin-glow: 0 0 25px rgba(129,140,248,0.35);
+    }
+
+    body {
+      background: var(--admin-bg);
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      padding-top: 2rem;
+    }
+
+    .admin-card {
+      backdrop-filter: blur(12px);
+      background: var(--admin-card);
+      border: 1px solid #e2e8f0;
+      border-radius: 24px;
+      box-shadow: var(--admin-shadow);
+      transition: all 0.3s ease;
+    }
+    .admin-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--admin-glow);
+    }
+
+    .admin-header {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: #ffffff;
+      border-radius: 24px;
+      padding: 2rem 2rem;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--admin-shadow);
+    }
+
+    .admin-title {
+      font-weight: 800;
+      font-size: 2.2rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .method-card {
+      border-radius: 18px;
+      border: 1px solid #e5e7eb;
+      padding: 1.25rem 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: #f9fafb;
+    }
+    .method-card:hover {
+      border-color: #c7d2fe;
+      background: #f3f4ff;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px rgba(129,140,248,0.25);
+    }
+    .method-card.active {
+      border-color: #4f46e5;
+      background: #eef2ff;
+      box-shadow: 0 0 0 3px rgba(129,140,248,0.3);
+      transform: translateY(-3px);
+    }
+
+    .method-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(129,140,248,0.2), rgba(139,92,246,0.2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      color: #4f46e5;
+      margin-right: 1rem;
+      box-shadow: 0 8px 18px rgba(129,140,248,0.3);
+    }
+
+    .badge-reco {
+      background: #dcfce7;
+      color: #15803d;
+      border-radius: 999px;
+      padding: 0.2rem 0.7rem;
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
+
+    .pay-btn {
+      background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+      border: none;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 1.2rem;
+      padding: 1.25rem 2rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 18px 40px rgba(37,99,235,0.45);
+      transition: all 0.3s ease;
+      color: #ffffff;
+    }
+    .pay-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 26px 55px rgba(37,99,235,0.6);
+      color: #ffffff !important;
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(148,163,184,0.3);
+      font-size: 0.98rem;
+      color: #0f172a;
+    }
+    .price-row:last-child {
+      border-bottom: none;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #16a34a;
+      padding-top: 1rem;
+    }
+
+    .status-badge {
+      position: absolute;
+      top: 5px;
+      right: 12px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 8px 25px rgba(22,163,74,0.4);
+    }
+
+    .security-badge {
+      background: rgba(15,23,42,0.25);
+      color: #e5f3ff;
+      border-radius: 999px;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .text-muted { color: #6b7280 !important; }
+
+    @media (max-width: 768px) {
+      .method-icon { margin-right: 0.75rem; width: 44px; height: 44px; }
+      .admin-header { padding: 1.5rem 1.4rem; }
+    }
+  </style>
+</head>
+
+<body class="py-5">
+  <div class="container tm-shell">
+    <!-- Payment Header -->
+    <div class="admin-header position-relative text-center text-white mb-5">
+      <div class="status-badge">
+        <i class="bi bi-shield-lock-fill"></i>
+      </div>
+      <div class="admin-title mb-1">Secure Checkout</div>
+      <p class="lead mb-2">Complete your order with encrypted payment</p>
+      <div class="security-badge mx-auto">
+        <i class="bi bi-lock-fill"></i>
+        Powered by Razorpay (Demo)
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- LEFT: Address + Payment Methods -->
+      <div class="col-lg-8">
+        <!-- Delivery Address -->
+        <div class="admin-card p-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h5 class="fw-bold mb-1 text-primary">📍 Delivery Address</h5>
+              <small class="text-muted">Your order will be delivered here</small>
+            </div>
+            <a href="{% url 'place_order' %}" class="btn btn-outline-primary rounded-pill px-4">
+              <i class="bi bi-pencil me-1"></i>Change
+            </a>
+          </div>
+
+          {% if address %}
+            <div class="border rounded-3 p-4" style="background:#f9fafb;">
+              <div class="fw-bold fs-5 mb-3 text-primary">{{ address.fullname|upper }}</div>
+              <div class="mb-3 text-muted">
+                {{ address.house }}, {{ address.area }}<br>
+                {{ address.city }}, {{ address.state }} - {{ address.pincode }}<br>
+                <small>{{ address.country }}</small>
+              </div>
+              <div class="fw-semibold text-success">
+                📞 {{ address.phone }}{% if address.alt_phone %} | {{ address.alt_phone }}{% endif %}
+              </div>
+            </div>
+          {% else %}
+            <div class="alert alert-warning border-0">
+              <i class="bi bi-exclamation-triangle me-2"></i>No address selected
+              <div class="mt-2">
+                <a href="{% url 'place_order' %}" class="btn btn-outline-warning btn-sm rounded-pill">
+                  Choose Address
+                </a>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="admin-card p-4">
+          <h5 class="fw-bold mb-3 text-primary">
+            <i class="bi bi-credit-card-2-front me-2"></i>Select Payment Method
+          </h5>
+          <small class="text-muted mb-4 d-block">Choose your preferred payment option</small>
+
+          <input type="hidden" id="selectedMethod" value="upi">
+
+          <!-- UPI -->
+          <div class="method-card active mb-3" data-method="upi">
+            <div class="d-flex align-items-center">
+              <div class="method-icon">
+                <span>₹</span>
+              </div>
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="fw-bold fs-5">UPI Payment</span>
+                  <span class="badge-reco">
+                    <i class="bi bi-star-fill me-1"></i>Recommended
+                  </span>
+                </div>
+                <small class="text-muted">Google Pay, PhonePe, Paytm, BHIM &amp; other UPI apps</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cards -->
+          <div class="method-card mb-3" data-method="card">
+            <div class="d-flex align-items-center">
+              <div class="method-icon">
+                <i class="bi bi-credit-card-2-front"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div class="fw-bold fs-5 mb-1">Credit / Debit Cards</div>
+                <small class="text-muted">Visa • Mastercard • RuPay • Maestro • Amex</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- UPI QR -->
+          <div class="method-card" data-method="upi_qr">
+            <div class="d-flex align-items-center">
+              <div class="method-icon">
+                <i class="bi bi-upc-scan"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div class="fw-bold fs-5 mb-1">UPI QR Code</div>
+                <small class="text-muted">Scan &amp; pay instantly with any UPI app</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Summary -->
+      <div class="col-lg-4">
+        <div class="admin-card sticky-top p-4" style="top: 20px;">
+          <div class="status-badge">
+            <i class="bi bi-cart-check"></i>
+          </div>
+          <h5 class="fw-bold mb-3 text-primary">
+            <i class="bi bi-receipt me-2"></i>Order Summary
+          </h5>
+          <small class="text-muted mb-4 d-block">
+            {{ prods|length }} item{{ prods|length|pluralize }} in cart
+          </small>
+
+          <div class="price-row">
+            <span>Items Total</span>
+            <span>₹{{ prods|grand_total:request.session.cart }}</span>
+          </div>
+          <div class="price-row">
+            <span class="text-success fw-semibold">Delivery</span>
+            <span class="text-success fw-semibold">FREE</span>
+          </div>
+
+          <hr class="my-4 opacity-25">
+
+          <div class="price-row">
+            <span class="fs-5 fw-bold">Amount Payable</span>
+            <span class="fs-3 fw-bold text-success">₹{{ prods|grand_total:request.session.cart }}</span>
+          </div>
+
+          <div class="text-center mt-3 mb-4 text-muted small">
+            100% secure payments. Your UPI / card details are encrypted.
+          </div>
+
+          <button id="payButton" class="btn pay-btn w-100 shadow-lg fs-5 py-4 mb-3">
+            <span class="spinner-border spinner-border-sm d-none me-2" id="paySpinner"></span>
+            <i class="bi bi-lock-fill me-2"></i>Pay Securely Now
+          </button>
+
+          <small class="text-muted text-center d-block">
+            🔒 Payments powered by Razorpay (Demo Mode)
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script>
+    const methodCards = document.querySelectorAll('.method-card');
+    const selectedMethodInput = document.getElementById('selectedMethod');
+    const payButton = document.getElementById('payButton');
+
+    methodCards.forEach(card => {
+      card.addEventListener('click', () => {
+        methodCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        selectedMethodInput.value = card.getAttribute('data-method');
+      });
+    });
+
+    payButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('paySpinner').classList.remove('d-none');
+      this.innerHTML = '<i class="bi bi-credit-card me-2"></i>Processing...';
+      setTimeout(() => {
+        window.location.href = "{% url 'payment' %}";
+      }, 1500);
+    });
+  </script>
+</body>
+</html>

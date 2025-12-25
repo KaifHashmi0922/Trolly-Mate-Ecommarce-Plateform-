@@ -1,0 +1,764 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    
+    <!-- Favicons -->
+    <link href="{% static 'assets/img/favicon.ico' %}" rel="icon">
+    <link href="{% static 'assets/img/favicon.png' %}" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Vendor CSS Files -->
+    <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/simple-datatables/style.css' %}" rel="stylesheet">
+    
+    <!-- Template Main CSS File -->
+    <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
+    
+    <!-- COMPLETE ENHANCED DASHBOARD CSS -->
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --dark-gradient: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* PERFECT SIDEBAR */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.97) !important;
+            backdrop-filter: blur(25px);
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.1);
+            width: 260px !important;
+            position: fixed !important;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            z-index: 1040;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            padding-bottom: 2rem;
+        }
+
+        .sidebar:hover { box-shadow: 8px 0 40px rgba(0, 0, 0, 0.15); }
+
+        .main-content {
+            margin-left: 0px !important;
+            padding: 1.5rem !important;
+            min-height: 100vh;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.97) !important;
+            backdrop-filter: blur(25px);
+            box-shadow: 0 2px 25px rgba(0, 0, 0, 0.1);
+            z-index: 1035;
+            padding-left: 280px !important;
+            padding-right: 2rem;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+
+        /* 🔥 ENHANCED SIDEBAR NAV */
+        
+        .sidebar-nav-item {
+            padding: 14px 20px;
+            margin: 6px 16px;
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: block;
+            color: #495057;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .sidebar-nav-item i {
+            width: 24px;
+            margin-right: 12px;
+            transition: all 0.3s ease;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-gradient);
+            transition: left 0.4s ease;
+            z-index: -1;
+        }
+
+        .sidebar-nav-item:hover::before,
+        .sidebar-nav-item.active::before { left: 0; }
+
+        .sidebar-nav-item:hover,
+        .sidebar-nav-item.active {
+            transform: translateX(6px);
+            border-color: rgba(102, 126, 234, 0.3);
+            color: white !important;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .sidebar-nav-item:hover i,
+        .sidebar-nav-item.active i {
+            color: white !important;
+            transform: scale(1.1);
+            opacity: 1;
+        }
+
+        .sidebar-header {
+            padding: 2.5rem 2rem 2rem;
+            background: var(--primary-gradient);
+            color: white;
+            text-align: center;
+            border-radius: 24px 0 24px 24px;
+            margin: -1.5rem -1.5rem 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-header h3 {
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+
+        /* 🔥 NEW ADMIN PROFILE HEADER */
+        .admin-profile-header {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin: 1rem 1rem 2rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .admin-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+            margin-bottom: 1rem;
+        }
+
+        .admin-name { font-weight: 700; font-size: 1.1rem; color: white; }
+        .admin-role { color: rgba(255,255,255,0.8); font-size: 0.9rem; }
+
+        /* Content cards */
+        .header-section, .stats-card {
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(20px);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .stats-card {
+            padding: 2rem 1.5rem;
+            text-align: center;
+            height: 100%;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .brand-logo {
+            background: var(--primary-gradient);
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.4rem;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        /* 🔥 FIXED HEADER PROFILE - ONLY THIS CHANGED */
+        .header-profile {
+            position: relative;
+        }
+
+        /* 🔥 FIXED DROPDOWN - KEY CHANGES */
+        .profile-dropdown {
+            min-width: 280px;
+            border: none;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 12px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: absolute !important;
+            top: 100%;
+            right: 0;
+            z-index: 1050;
+            display: block !important;
+        }
+
+        .profile-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .profile-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .profile-avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: 3px solid rgba(255,255,255,0.3);
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .profile-name { font-weight: 700; font-size: 1.2rem; margin-bottom: 0.25rem; }
+        .profile-email { opacity: 0.9; font-size: 0.9rem; }
+
+        .profile-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-item:hover {
+            background: rgba(102,126,234,0.1);
+            color: #495057;
+            transform: translateX(8px);
+        }
+
+        .profile-item:last-child { border-bottom: none; }
+
+        /* Clock Styles */
+        .clock-display {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 0.75rem 1.25rem;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            min-width: 140px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Hover trigger for profile */
+        .hover-trigger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3) !important;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0 !important; padding: 1rem; }
+            .header { padding-left: 1rem !important; padding-right: 1rem; }
+        }
+
+        @media (max-width: 768px) {
+            .main-content { padding: 0.75rem; }
+            .header-section { padding: 1.5rem; }
+        }
+
+        .mobile-menu-toggle {
+            background: var(--primary-gradient) !important;
+            border: none;
+            border-radius: 12px;
+            padding: 8px 12px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .back-to-top {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .progress { height: 6px; background: rgba(0,0,0,0.1); border-radius: 10px; }
+        .progress-bar { border-radius: 10px; transition: width 2s ease; }
+    </style>
+</head>
+
+<body>
+    <!-- ======= Header ======= -->
+    <header class="header fixed-top d-flex align-items-center">
+        <div class="d-flex align-items-center justify-content-between w-100 px-4">
+            <!-- Mobile menu toggle -->
+            <button class="btn mobile-menu-toggle d-lg-none me-3" id="mobileToggle">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+            
+            <!-- Logo -->
+            <a href="/admins/" class="logo d-flex align-items-center text-decoration-none">
+                <div class="brand-logo me-3">
+                    <i class="bi bi-cart4 fs-3"></i>
+                </div>
+                <div>
+                    <h4 class="mb-0 fw-bold text-dark lh-1">Trolley Mate</h4>
+                    <small class="text-muted d-none d-md-block">Admin Dashboard</small>
+                </div>
+            </a>
+
+            <!-- Header Right - Clock + Profile -->
+            <div class="d-flex align-items-center gap-3">
+                <!-- 🔥 LIVE CLOCK -->
+                <div class="clock-display" id="liveClock">
+                    09:22 AM
+                </div>
+                
+                <!-- 🔥 FIXED PROFILE DROPDOWN WITH PERFECT HOVER -->
+                <div class="dropdown header-profile profile-hover-container" id="profileContainer">
+                    <button class="btn btn-outline-primary btn-sm dropdown-toggle d-flex align-items-center gap-2 px-4 py-2 shadow-sm hover-trigger profile-trigger" 
+                            type="button" id="profileToggle" aria-expanded="false">
+                        <div class="admin-avatar-sm" style="width: 36px; height: 36px; font-size: 1rem;">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <span class="d-none d-md-inline fw-semibold">Admin</span>
+                        <i class="bi bi-chevron-down ms-1"></i>
+                    </button>
+                    
+                    <!-- 🔥 PERFECT PROFILE DROPDOWN -->
+                    <ul class="dropdown-menu dropdown-menu-end profile-dropdown shadow-lg" id="profileDropdown">
+                        
+                            {% comment %} <a href="{% url 'admin_profile' %}"> {% endcomment %}
+                        <!-- Profile Header -->
+                        <li class="profile-header">
+                            <div class="profile-avatar-large">
+                                <i class="bi bi-person-circle fs-1"></i>
+                            </div>
+                            <div class="profile-name">Super Admin</div>
+                            <div class="profile-email">admin@trolleymate.com</div>
+                        </li>
+                        
+                        <!-- Profile Items WITH LINKS -->
+                        <li><a class="profile-item" href="/admins/admin_profile/" target="_blank">
+                            <i class="bi bi-person-circle fs-4 text-primary"></i>
+                            <span>My Profile</span>
+                        </a></li>
+                        
+                        <li><a class="profile-item" href="/admins/admin_profile/">
+                            <i class="bi bi-gear fs-4 text-warning"></i>
+                            <span>Settings</span>
+                        </a></li>
+                        
+                        <li><a class="profile-item" href="/admins/admin_profile/">
+                            <i class="bi bi-shield-check fs-4 text-success"></i>
+                            <span>Account Security</span>
+                        </a></li>
+                        
+                        <li><a class="profile-item" href="/admins/admin_profile/">
+                            <i class="bi bi-activity fs-4 text-info"></i>
+                            <span>Activity Log</span>
+                        </a></li>
+                        
+                        <li><hr class="dropdown-divider my-0"></li>
+                    </a>
+
+                        <li><a class="profile-item text-danger" href="/admins/logout/">
+                            <i class="bi bi-box-arrow-right fs-4"></i>
+                            <span>Logout</span>
+                        </a></li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar d-lg-block">
+        <!-- 🔥 NEW ADMIN PROFILE HEADER -->
+        <div class="admin-profile-header">
+            <div class="admin-avatar">
+                <i class="bi bi-person-shield"></i>
+            </div>
+            <div class="admin-name">Super Admin</div>
+            <div class="admin-role">Platform Owner</div>
+        </div>
+
+        <div class="sidebar-header">
+            <h3 class="mb-2 fw-bold fs-4 lh-1">Dashboard</h3>
+            <p class="mb-0 opacity-90 fs-6">Manage your eCommerce empire</p>
+        </div>
+
+        <div class="px-3 pb-4">
+            <!-- Navigation Items -->
+            <a href="/admins/add_company/" class="sidebar-nav-item">
+                <i class="bi bi-building-gear"></i> Add Company
+            </a>
+            <a href="/admins/view_companys/" class="sidebar-nav-item">
+                <i class="bi bi-buildings"></i> View Companies
+            </a>
+            <a href="/admins/addproduct/" class="sidebar-nav-item">
+                <i class="bi bi-plus-circle"></i> Add Product
+            </a>
+            <a href="/admins/admins_viewproduct/" class="sidebar-nav-item">
+                <i class="bi bi-boxes"></i> View Products
+            </a>
+            <a href="/admins/view_custmers/" class="sidebar-nav-item">
+                <i class="bi bi-people"></i> View Customers
+            </a>
+            <a href="/admins/analytics/" class="sidebar-nav-item">
+                <i class="bi bi-graph-up"></i> Analytics
+            </a>
+
+            <!-- Quick Stats -->
+            <div class="mt-5 pt-4 border-top border-light">
+                <h6 class="text-muted mb-3 fw-semibold">Quick Stats</h6>
+                <div class="row g-2 text-center">
+                    <div class="col-6">
+                        <div class="stats-card p-3 rounded-3">
+                            <i class="bi bi-building fs-1 text-primary mb-2"></i>
+                            <div class="fw-bold text-primary h5 mb-1">{{ total_companies|default:"12" }}</div>
+                            <small class="text-muted">Companies</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stats-card p-3 rounded-3">
+                            <i class="bi bi-box-seam fs-1 text-success mb-2"></i>
+                            <div class="fw-bold text-success h5 mb-1">{{ total_products|default:"156" }}</div>
+                            <small class="text-muted">Products</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+
+    <!-- ======= Main Content ======= -->
+    <main id="main" class="main  col-lg-9">
+        <div class="main-content">
+            <!-- Welcome Section -->
+            <section class="header-section">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-8">
+                        <h1 class="display-5 fw-bold mb-3 lh-1">
+                            Welcome back, <span class="text-primary">Super Admin!</span>
+                        </h1>
+                        <p class="lead mb-0 text-muted fs-5">
+                            Complete control over your eCommerce platform. 
+                            Quick actions available below.
+                        </p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <div class="d-flex gap-2 justify-content-lg-end flex-wrap">
+                            <a href="/admins/addproduct/" class="btn btn-outline-primary px-4 py-2">
+                                <i class="bi bi-plus-circle me-2"></i>New Product
+                            </a>
+                            <a href="/admins/analytics/" class="btn btn-primary px-4 py-2">
+                                <i class="bi bi-graph-up me-2"></i>Analytics Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stats Overview -->
+            <section class="row g-4 mb-5">
+                <div class="col-xl-3 col-md-6">
+                    <div class="stats-card h-100">
+                        <div class="brand-logo mb-3">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h2 class="fw-bold display-5 mb-1 text-primary" data-target="{{ total_customers|default:'1234' }}">0</h2>
+                        <p class="mb-2 text-muted fs-6">Total Customers</p>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-primary" style="width: 78%"></div>
+                        </div>
+                        <small class="text-success"><i class="bi bi-arrow-up me-1"></i>12% from last month</small>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stats-card h-100">
+                        <div class="brand-logo mb-3" style="background: var(--success-gradient);">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <h2 class="fw-bold display-5 mb-1 text-success" data-target="{{ total_companies|default:'12' }}">0</h2>
+                        <p class="mb-2 text-muted fs-6">Total Companies</p>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-success" style="width: 92%"></div>
+                        </div>
+                        <small class="text-success"><i class="bi bi-arrow-up me-2"></i>8% growth</small>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stats-card h-100">
+                        <div class="brand-logo mb-3" style="background: var(--warning-gradient);">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <h2 class="fw-bold display-5 mb-1 text-warning" data-target="{{ total_products|default:'156' }}">0</h2>
+                        <p class="mb-2 text-muted fs-6">Total Products</p>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-warning" style="width: 45%"></div>
+                        </div>
+                        <small class="text-primary"><i class="bi bi-arrow-up me-1"></i>15 new today</small>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stats-card h-100">
+                        <div class="brand-logo mb-3" style="background: var(--secondary-gradient);">
+                            <i class="bi bi-cart-check"></i>
+                        </div>
+                        <h2 class="fw-bold display-5 mb-1 text-danger" data-target="{{ total_orders|default:'47' }}">0</h2>
+                        <p class="mb-2 text-muted fs-6">Total Orders</p>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-danger" style="width: 67%"></div>
+                        </div>
+                        <small class="text-success"><i class="bi bi-arrow-up me-1"></i>22 today</small>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Action Buttons -->
+            <section class="row g-4 mb-5 justify-content-center">
+                <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
+                    <a href="/admins/addproduct/" class="btn btn-primary btn-lg w-100 p-4 shadow-lg h-100 d-flex flex-column align-items-center text-decoration-none">
+                        <i class="bi bi-plus-circle fs-1 mb-3 text-white"></i>
+                        <span class="fw-bold fs-5 text-white">Add Product</span>
+                    </a>
+                </div>
+                <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
+                    <a href="/admins/admins_viewproduct/" class="btn btn-outline-light btn-lg w-100 p-4 shadow h-100 d-flex flex-column align-items-center text-decoration-none">
+                        <i class="bi bi-eye fs-1 mb-3"></i>
+                        <span class="fw-bold fs-5">View Products</span>
+                    </a>
+                </div>
+                <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
+                    <a href="/admins/view_companys/" class="btn btn-success btn-lg w-100 p-4 shadow-lg h-100 d-flex flex-column align-items-center text-decoration-none">
+                        <i class="bi bi-building fs-1 mb-3 text-white"></i>
+                        <span class="fw-bold fs-5 text-white">Companies</span>
+                    </a>
+                </div>
+                <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
+                    <a href="/admins/view_custmers/" class="btn btn-info btn-lg w-100 p-4 shadow h-100 d-flex flex-column align-items-center text-decoration-none">
+                        <i class="bi bi-people fs-1 mb-3"></i>
+                        <span class="fw-bold fs-5">Customers</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Analytics CTA -->
+            <div class="text-center">
+                <a href="/admins/analytics/" class="btn btn-primary btn-lg px-6 py-3 shadow-lg">
+                    <i class="bi bi-graph-up-arrow me-2"></i>
+                    View Complete Analytics Dashboard
+                </a>
+            </div>
+
+            {% block show %}{% endblock show %}
+        </div>
+    </main>
+
+    <!-- Back to top -->
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center fixed-bottom p-3 rounded-circle shadow-lg" 
+       style="right: 20px; bottom: 20px; width: 60px; height: 60px; z-index: 1000; display: none;">
+        <i class="bi bi-arrow-up fs-4"></i>
+    </a>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 🔥 COMPLETE ENHANCED JS -->
+    <script>
+        // Mobile sidebar toggle
+        document.getElementById('mobileToggle')?.addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('d-lg-block');
+            document.body.classList.toggle('sidebar-open');
+        });
+
+        // Close sidebar on outside click
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('mobileToggle');
+            if (window.innerWidth < 992 && 
+                !sidebar.contains(e.target) && 
+                !toggle?.contains(e.target) &&
+                document.body.classList.contains('sidebar-open')) {
+                sidebar.classList.remove('d-lg-block');
+                document.body.classList.remove('sidebar-open');
+            }
+        });
+
+        // 🔥 LIVE CLOCK
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour12: true, 
+                hour: 'numeric', 
+                minute: '2-digit' 
+            });
+            document.getElementById('liveClock').textContent = timeString;
+        }
+        updateClock();
+        setInterval(updateClock, 1000 * 60); // Update every minute
+
+        // Smooth scroll back to top
+        const backToTop = document.querySelector('.back-to-top');
+        window.addEventListener('scroll', () => {
+            backToTop.style.display = window.scrollY > 300 ? 'flex' : 'none';
+        });
+        backToTop?.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Active nav highlighting
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.sidebar-nav-item').forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
+
+        // Animated counters
+        function animateCounters() {
+            document.querySelectorAll('[data-target]').forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-target'));
+                const duration = 2000;
+                const increment = target / (duration / 16);
+                let current = 0;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        counter.textContent = target.toLocaleString();
+                        clearInterval(timer);
+                    } else {
+                        counter.textContent = Math.floor(current).toLocaleString();
+                    }
+                }, 16);
+            });
+        }
+
+        // Intersection Observer
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+        document.querySelectorAll('.stats-card').forEach(card => observer.observe(card));
+
+        // Responsive adjustments
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 992) {
+                document.getElementById('sidebar').classList.add('d-lg-block');
+                document.body.classList.remove('sidebar-open');
+            }
+        });
+
+        // 🔥 PERFECT HOVER PROFILE DROPDOWN ✅
+        const profileContainer = document.getElementById('profileContainer');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        // Hover show dropdown (Desktop)
+        profileContainer?.addEventListener('mouseenter', function() {
+            profileDropdown.classList.add('show');
+            profileDropdown.style.animation = 'slideDown 0.3s ease-out';
+        });
+
+        // Hover hide dropdown
+        profileContainer?.addEventListener('mouseleave', function() {
+            profileDropdown.classList.remove('show');
+        });
+
+        // Keep dropdown open when hovering inside it
+        profileDropdown?.addEventListener('mouseenter', function() {
+            profileDropdown.classList.add('show');
+        });
+
+        profileDropdown?.addEventListener('mouseleave', function() {
+            profileDropdown.classList.remove('show');
+        });
+
+        // Mobile click fallback
+        const profileToggle = document.getElementById('profileToggle');
+        profileToggle?.addEventListener('click', function(e) {
+            if (window.innerWidth < 992) {
+                e.stopPropagation();
+            }
+        });
+    </script>
+</body>
+</html>

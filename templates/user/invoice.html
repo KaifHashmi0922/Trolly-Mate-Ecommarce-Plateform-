@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+{% load static %}
+{% load my_filter %}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Order Invoice | Trollymate</title>
+
+  <!-- Admin Assets -->
+  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* SAME BG FAMILY AS ORDER / PAYMENT PAGES */
+      --admin-bg: radial-gradient(circle at top,
+        #e5f0ff 0,
+        #c7ddff 35%,
+        #a5b4fc 70%,
+        #818cf8 100%);
+      --admin-card: rgba(255,255,255,0.98);
+      --admin-shadow: 0 25px 50px rgba(15,23,42,0.14);
+      --admin-glow: 0 0 30px rgba(129,140,248,0.3);
+    }
+
+    @media print {
+      body { background: white !important; }
+      .admin-card { box-shadow: none !important; border: 1px solid #dee2e6 !important; }
+      .no-print { display: none !important; }
+    }
+
+    body {
+      background: var(--admin-bg);
+      font-family: 'Nunito', system-ui, sans-serif;
+      line-height: 1.6;
+      color: #1f2937;
+      padding: 2rem 0;
+    }
+
+    .invoice-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .admin-card {
+      backdrop-filter: blur(25px);
+      background: var(--admin-card);
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,0.3);
+      box-shadow: var(--admin-shadow);
+      overflow: hidden;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .admin-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--admin-glow);
+    }
+
+    .invoice-header {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      padding: 2.5rem 2.5rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .invoice-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="1.5" fill="rgba(255,255,255,0.05)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .status-badge {
+      position: absolute;
+      top: 5px;
+      right: 20px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 8px 25px rgba(22,163,74,0.4);
+      z-index: 2;
+    }
+
+    .invoice-title {
+      font-weight: 800;
+      font-size: 2.3rem;
+      margin-bottom: 0.5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .invoice-meta {
+      position: relative;
+      z-index: 2;
+    }
+
+    .invoice-content {
+      padding: 2.5rem 2.5rem 2rem;
+    }
+
+    .table-invoice {
+      margin-bottom: 2rem;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(15,23,42,0.10);
+    }
+    .table-invoice thead th {
+      background: linear-gradient(135deg, #f8fafc, #e5edf7);
+      border: none;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #374151;
+      padding: 1.25rem 1.1rem;
+    }
+    .table-invoice tbody td {
+      padding: 1.15rem;
+      vertical-align: middle;
+      border-color: #f1f5f9;
+    }
+    .table-invoice tbody tr:hover {
+      background: #f3f4ff;
+    }
+
+    .price-summary {
+      background: #f0fdf4;
+      border-radius: 20px;
+      border: 1px solid #bbf7d0;
+      padding: 2rem;
+    }
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(16,185,129,0.12);
+    }
+    .price-row:last-child {
+      border-bottom: none;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #16a34a;
+      padding-top: 1rem;
+      background: rgba(255,255,255,0.7);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+      border-radius: 50px;
+      padding: 0.5rem 1.5rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+
+    .print-btn {
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      border: none;
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .print-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(37,99,235,0.35);
+      color: white;
+    }
+
+    .small-note {
+      font-size: 0.82rem;
+      color: #6b7280;
+    }
+
+    @media (max-width: 768px) {
+      .invoice-content { padding: 1.5rem; }
+      .table-invoice th,
+      .table-invoice td { padding: 0.75rem 0.5rem; font-size: 0.9rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="invoice-wrapper">
+    <div class="admin-card position-relative">
+      <!-- Print Button -->
+      <div class="position-absolute top-20px end-20px no-print z-3">
+        <button onclick="window.print()" class="print-btn shadow-sm">
+          <i class="bi bi-printer me-1"></i>Print Invoice
+        </button>
+      </div>
+
+      <!-- Header -->
+      <div class="invoice-header position-relative text-white">
+        <div class="status-badge">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <div class="invoice-title mb-2 position-relative z-2">Order Invoice</div>
+            <div class="h6 fw-semibold mb-0 position-relative z-2">
+              Order ID: <strong>#TM{{ order_id|default:"123456" }}</strong>
+            </div>
+            <div class="position-relative z-2">
+              Thank you for shopping with <span class="brand-badge">Trollymate</span>
+            </div>
+          </div>
+          <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <div class="invoice-meta">
+              <div class="mb-1"><i class="bi bi-calendar-event me-1"></i>Date: {{ order_date }}</div>
+              <div class="mb-2"><i class="bi bi-credit-card me-1"></i>Payment: {{ payment_mode|default:"Online" }}</div>
+              <span class="brand-badge">
+                <i class="bi bi-check-circle-fill me-1"></i>Paid
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="invoice-content">
+        <!-- Address Section -->
+        <div class="row mb-5">
+          <div class="col-lg-6 mb-4 mb-lg-0">
+            <h6 class="fw-bold mb-3 text-uppercase text-primary">Delivery Address</h6>
+            {% if address %}
+              <div class="p-3 border rounded-3 bg-light-subtle">
+                <div class="fw-bold text-primary mb-2">{{ address.fullname|upper }}</div>
+                <div class="mb-2">
+                  {{ address.house }}, {{ address.area }}<br>
+                  {{ address.city }}, {{ address.state }} - {{ address.pincode }}<br>
+                  {{ address.country }}
+                </div>
+                <div class="text-success fw-semibold">
+                  📞 {{ address.phone }}{% if address.alt_phone %} | {{ address.alt_phone }}{% endif %}
+                </div>
+              </div>
+            {% else %}
+              <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle me-2"></i>No address available
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="col-lg-6">
+            <h6 class="fw-bold mb-3 text-uppercase text-primary">Billed To</h6>
+            <div class="p-3 border rounded-3 bg-light-subtle">
+              <div class="fw-bold mb-2 text-primary">{{ cust_name|default:"Trollymate Customer" }}</div>
+              <div class="mb-2">{{ cust_email|default:"-" }}</div>
+              <div class="text-success fw-semibold">
+                📞 {{ address.phone|default:"-" }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="table-responsive mb-5">
+          <table class="table table-invoice">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th width="100" class="text-center">Quantity</th>
+                <th width="140" class="text-end">Unit Price</th>
+                <th width="140" class="text-end">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in line_items %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    {% if item.product.image %}
+                    <img src="{{ item.product.image.url }}" 
+                         alt="{{ item.product.name }}" 
+                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; margin-right: 12px;">
+                    {% endif %}
+                    <div>
+                      <div class="fw-semibold">{{ item.product.name|title }}</div>
+                      <small class="text-muted">SKU: {{ item.product.id }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center fw-bold fs-5">{{ item.qty }}</td>
+                <td class="text-end fw-semibold fs-5">{{ item.price|Currency }}</td>
+                <td class="text-end text-success fw-bold fs-4">{{ item.total|Currency }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Price Summary -->
+        <div class="price-summary">
+          <div class="row">
+            <div class="col-md-6">
+              <h6 class="fw-bold mb-3 text-success">
+                <i class="bi bi-info-circle me-2"></i>Order Notes
+              </h6>
+              <ul class="small-note list-unstyled mb-0">
+                <li class="mb-1">• System-generated invoice (no signature required)</li>
+                <li class="mb-1">• Returns accepted within 7 days of delivery</li>
+                <li>• For GST invoice or support: <a href="mailto:support@trollymate.com">support@trollymate.com</a></li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <div class="price-row">
+                <span>Subtotal ({{ line_items|length }} items)</span>
+                <span>₹{{ grand_total }}</span>
+              </div>
+              <div class="price-row">
+                <span class="text-success">Platform Fee</span>
+                <span class="text-success">FREE</span>
+              </div>
+              <div class="price-row">
+                <span class="text-success">Delivery Charges</span>
+                <span class="text-success">FREE</span>
+              </div>
+              <div class="price-row">
+                <strong class="fs-4">Grand Total</strong>
+                <strong class="fs-4 text-success">₹{{ grand_total }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-4 pt-4 border-top">
+          <div class="fw-bold text-primary fs-5 mb-2">
+            Thank you for shopping with Trollymate! 🛒✨
+          </div>
+          <div class="small-note text-muted">
+            Questions? <a href="mailto:support@trollymate.com" class="text-primary fw-semibold">support@trollymate.com</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

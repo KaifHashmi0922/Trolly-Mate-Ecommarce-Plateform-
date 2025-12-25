@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Trollymate | Forgot Password (Phone)</title>
+
+    <!-- Admin Assets -->
+    <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+    <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* EXACT LOGIN COLORS */
+            --admin-bg: radial-gradient(circle at top,
+                #e5f0ff 0,
+                #c7ddff 35%,
+                #a5b4fc 70%,
+                #818cf8 100%);
+            --admin-card: rgba(255,255,255,0.98);
+            --admin-shadow: 0 25px 50px rgba(15,23,42,0.14);
+            --admin-glow: 0 0 30px rgba(129,140,248,0.3);
+        }
+        body {
+            background: var(--admin-bg);
+            font-family: 'Nunito', sans-serif;
+            min-height: 100vh;
+        }
+        .admin-header {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            backdrop-filter: blur(20px);
+            border-radius: 24px 24px 0 0;
+            box-shadow: var(--admin-shadow);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .admin-card {
+            backdrop-filter: blur(20px);
+            background: var(--admin-card);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 24px;
+            box-shadow: var(--admin-shadow);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        .admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--admin-glow);
+        }
+        .admin-title {
+            background: linear-gradient(135deg, white, #e0f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            font-size: 2.2rem;
+        }
+        .otp-input {
+            font-size: 1.8rem;
+            letter-spacing: 12px;
+            font-weight: 800;
+            text-align: center;
+        }
+        .form-control {
+            border-radius: 16px;
+            border: 2px solid rgba(79,70,229,0.2);
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.8);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .form-control:focus {
+            border-color: #4f46e5;
+            box-shadow: var(--admin-glow);
+            background: white;
+            transform: translateY(-1px);
+        }
+        .admin-btn {
+            border-radius: 50px;
+            font-weight: 700;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border: none;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+        .admin-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--admin-glow);
+        }
+        .status-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(16,185,129,0.4);
+        }
+        .input-group-text {
+            border-radius: 16px 0 0 16px;
+            background: rgba(79,70,229,0.1);
+            border-color: rgba(79,70,229,0.2);
+            color: #4f46e5;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+        .navbar-brand {
+            color: rgba(255,255,255,0.9) !important;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+
+<body class="d-flex align-items-center min-vh-100 py-5">
+    <!-- Breadcrumb (top nav) -->
+    <div class="container-fluid position-fixed top-0 z-3">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-transparent">
+            <div class="container">
+                <a href="{% url 'index' %}" class="navbar-brand fw-bold fs-4">
+                    <i>Trolly Mate</i>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <div class="container">
+        <!-- Breadcrumb Header -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-6 text-center">
+                <div class="admin-header p-4 position-relative">
+                    <div class="status-badge">
+                        {% if status %}<i class="bi bi-shield-check"></i>
+                        {% else %}<i class="bi bi-telephone"></i>{% endif %}
+                    </div>
+                    <div class="admin-title mb-2">
+                        {% if status %}Verify Phone OTP{% else %}Forgot Password{% endif %}
+                    </div>
+                    <p class="lead text-white opacity-90 mb-0">
+                        {% if status %}Enter code sent to your phone{% else %}Enter phone to receive OTP{% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7 col-11">
+                <!-- Error Alert -->
+                {% if message %}
+                <div class="alert alert-danger alert-dismissible fade show mb-4 position-relative" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endif %}
+
+                <!-- Phone Reset Form Card -->
+                <div class="admin-card p-5 position-relative">
+                    <div class="status-badge">
+                        <i class="bi bi-telephone-fill"></i>
+                    </div>
+
+                    <!-- Form Content -->
+                    <form method="post" 
+                          action="{% url 'forget_pass_phone' %}" 
+                          class="needs-validation" 
+                          novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Phone Field (Both screens) -->
+                        <div class="mb-4">
+                            <label class="form-label">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-telephone-fill"></i>
+                                </span>
+                                {% if status %}
+                                    <input type="tel" 
+                                           name="phone" 
+                                           value="{{ phone }}" 
+                                           class="form-control form-control-lg" 
+                                           readonly>
+                                {% else %}
+                                    <input type="tel" 
+                                           name="phone" 
+                                           value="{{ phone }}" 
+                                           class="form-control form-control-lg" 
+                                           placeholder="9876543210"
+                                           pattern="[0-9]{10}"
+                                           maxlength="10"
+                                           required>
+                                    <div class="invalid-feedback">Enter valid 10-digit phone</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if status %}
+                            <!-- OTP Verification Form -->
+                            <div class="mb-4">
+                                <label class="form-label">Enter 6-Digit OTP</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-shield-check"></i>
+                                    </span>
+                                    <input type="text" 
+                                           name="otp" 
+                                           class="form-control form-control-lg otp-input" 
+                                           maxlength="6"
+                                           pattern="\d{6}"
+                                           placeholder="000000"
+                                           required>
+                                    <div class="invalid-feedback">Enter valid 6-digit OTP</div>
+                                </div>
+                                <div class="form-text mt-2 text-muted">
+                                    <i class="bi bi-clock me-1"></i>Code expires in 10 minutes
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Email fallback (only send screen) -->
+                        {% if not status %}
+                        <div class="text-center mb-4">
+                            <a href="{% url 'forget_pass_email' %}" class="text-muted text-decoration-none fw-medium">
+                                <i class="bi bi-envelope me-2"></i>Use email instead
+                            </a>
+                        </div>
+                        {% endif %}
+
+                        <!-- Submit Button -->
+                        <button class="btn admin-btn w-100 text-white fs-5 py-4 mb-4" type="submit">
+                            <span class="spinner-border spinner-border-sm d-none me-2" id="phoneSpinner"></span>
+                            {% if status %}
+                                <i class="bi bi-check-circle-fill me-2"></i>Verify OTP
+                            {% else %}
+                                <i class="bi bi-arrow-right-circle-fill me-2"></i>Send OTP Code
+                            {% endif %}
+                        </button>
+                    </form>
+
+                    <!-- Back to Login -->
+                    <div class="text-center">
+                        <a href="{% url 'login' %}" class="text-muted text-decoration-none fw-medium">
+                            <i class="bi bi-arrow-left me-2"></i>← Back to Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+        // Form validation + loading
+        document.querySelector('.needs-validation').addEventListener('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            this.classList.add('was-validated');
+            document.getElementById('phoneSpinner').classList.remove('d-none');
+        });
+
+        // OTP auto-format
+        const otpInput = document.querySelector('input[name="otp"]');
+        if (otpInput) {
+            otpInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '').slice(0,6);
+            });
+        }
+
+        // Phone formatting
+        document.querySelectorAll('input[name="phone"]').forEach(input => {
+            input.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '').slice(0,10);
+            });
+        });
+    </script>
+</body>
+</html>

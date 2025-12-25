@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+{% load static %}
+{% load my_filter %}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Trollymate | Order Summary</title>
+
+  <!-- Admin Assets -->
+  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Softer pastel blue / indigo background */
+      --admin-bg: radial-gradient(circle at top,
+        #e5f0ff 0,
+        #c7ddff 35%,
+        #a5b4fc 70%,
+        #818cf8 100%);
+      /* White cards for contrast */
+      --admin-card: #ffffff;
+      --admin-shadow: 0 16px 40px rgba(15,23,42,0.12);
+      --admin-glow: 0 0 25px rgba(129,140,248,0.35);
+    }
+
+    body {
+      background: var(--admin-bg);
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      padding-top: 2rem;
+    }
+
+    .admin-header {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      backdrop-filter: blur(20px);
+      border-radius: 28px;
+      color: #ffffff;
+      padding: 2.25rem 2.5rem;
+      margin-bottom: 2.5rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--admin-shadow);
+    }
+
+    .admin-title {
+      font-weight: 800;
+      font-size: clamp(2rem, 5vw, 2.8rem);
+      margin-bottom: 0.5rem;
+    }
+
+    .admin-card {
+      backdrop-filter: blur(12px);
+      background: var(--admin-card);
+      border: 1px solid #e2e8f0;
+      border-radius: 24px;
+      box-shadow: var(--admin-shadow);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+
+    .admin-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--admin-glow);
+    }
+
+    .status-badge {
+      position: absolute;
+      top: 2px;
+      right: 5px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #ffffff;
+      border-radius: 999px;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      box-shadow: 0 8px 25px rgba(22,163,74,0.4);
+      z-index: 2;
+    }
+
+    .section-title {
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: #0f172a;
+      margin-bottom: 1rem;
+    }
+
+    .product-card {
+      border-radius: 18px;
+      padding: 1.25rem 1.1rem;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      margin-bottom: 1rem;
+    }
+
+    .product-card:hover {
+      background: #f3f4ff;
+      border-color: #c7d2fe;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(129,140,248,0.25);
+    }
+
+    .product-img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 18px;
+      box-shadow: 0 10px 24px rgba(15,23,42,0.18);
+      transition: all 0.3s ease;
+    }
+
+    .product-img:hover {
+      transform: scale(1.04);
+    }
+
+    .qty-chip {
+      background: #dcfce7;
+      color: #15803d;
+      border-radius: 999px;
+      padding: 1.35rem 0.9rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .offer-badge {
+      background: #fee2e2;
+      color: #b91c1c;
+      border-radius: 999px;
+      padding: 0.25rem 0.85rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-block;
+    }
+
+    .price-summary {
+      background: #f0fdf4;
+      border-radius: 24px;
+      border: 1px solid #bbf7d0;
+      padding: 2.25rem;
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px dashed #bbf7d0;
+      font-size: 1rem;
+      color: #0f172a;
+    }
+
+    .price-row:last-child {
+      border-bottom: none;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #16a34a;
+      padding-top: 1.25rem;
+    }
+
+    .proceed-btn {
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      border: none;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 1.2rem;
+      padding: 1.25rem 3rem;
+      text-transform: uppercase;
+      letter-spacing: 1.3px;
+      box-shadow: 0 18px 40px rgba(37,99,235,0.45);
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #ffffff;
+    }
+
+    .proceed-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 26px 55px rgba(37,99,235,0.6);
+      color: #ffffff;
+    }
+
+    .text-muted {
+      color: #6b7280 !important;
+    }
+
+    @media (max-width: 768px) {
+      .product-img { width: 64px; height: 64px; }
+      .admin-header { padding: 1.75rem 1.5rem; }
+    }
+  </style>
+</head>
+
+<body class="py-5">
+  <div class="container tm-shell">
+    <!-- Header -->
+    <div class="admin-header position-relative text-center mb-5">
+      <div class="status-badge">
+        <i class="bi bi-cart-check-fill"></i>
+      </div>
+      <div class="admin-title">Order Summary</div>
+      <div class="h5 fw-semibold mb-1">Review your cart before checkout</div>
+      <div class="lead opacity-90">
+        Order ID: <strong>#TM{{ order_id|default:"123456" }}</strong>
+        · Expected: {{ expected_date|default:"24 Dec 2025" }}
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Address -->
+      <div class="col-lg-4">
+        <div class="admin-card p-4 h-100 position-relative">
+          <div class="status-badge">
+            <i class="bi bi-geo-alt-fill"></i>
+          </div>
+          <h5 class="section-title mb-3">
+            <i class="bi bi-house-door me-2 text-success"></i>Delivery Address
+          </h5>
+
+          {% if address %}
+            <div class="border rounded-3 p-4 bg-surface mb-3" style="background:#f9fafb;">
+              <div class="fw-bold fs-5 mb-3 text-primary">{{ address.fullname|upper }}</div>
+              <div class="mb-3 lh-sm text-muted">
+                {{ address.house }}, {{ address.area }}<br>
+                {{ address.city }}, {{ address.state }} - {{ address.pincode }}<br>
+                <small>{{ address.country }}</small>
+              </div>
+              <div class="qty-chip mb-2">
+                📞 {{ address.phone }}{% if address.alt_phone %} | {{ address.alt_phone }}{% endif %}
+              </div>
+            </div>
+            <a href="{% url 'show_address' %}" class="btn btn-outline-primary w-100 rounded-pill">
+              <i class="bi bi-pencil-square me-2"></i>Change Address
+            </a>
+          {% else %}
+            <div class="text-center py-4">
+              <i class="bi bi-house-x fs-1 text-muted mb-3"></i>
+              <h6 class="text-muted mb-3">No address selected</h6>
+              <a href="{% url 'add_address' %}" class="btn btn-primary rounded-pill px-4">
+                <i class="bi bi-plus-circle me-2"></i>Add Address
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Products -->
+      <div class="col-lg-8">
+        <div class="admin-card p-4 position-relative">
+          <div class="status-badge">
+            <i class="bi bi-basket3-fill"></i>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="section-title mb-0">
+              <i class="bi bi-box-seam me-2 text-success"></i>Your Cart Items
+            </h5>
+            <span class="badge bg-success-subtle text-success fs-6 px-3 py-2">
+              {{ prods|length }} item{{ prods|length|pluralize }}
+            </span>
+          </div>
+
+          <div class="row g-3">
+            {% for p in prods %}
+            <div class="col-12 product-card position-relative"
+                 data-bs-toggle="collapse"
+                 data-bs-target="#product-{{ p.id }}">
+              <div class="row align-items-center">
+                <div class="col-md-3 col-4">
+                  <img src="{{ p.image.url }}" alt="{{ p.name }}" class="product-img mx-auto d-block">
+                </div>
+                <div class="col-md-6 col-5">
+                  <h6 class="fw-bold mb-2 lh-sm text-slate-900">{{ p.name|title }}</h6>
+                  <div class="text-muted small mb-2">₹{{ p.price|Currency }}</div>
+                  <div class="offer-badge">
+                    13% OFF · Limited Time
+                  </div>
+                </div>
+                <div class="col-md-3 col-3 text-md-end text-center mt-2 mt-md-0">
+                  <div class="qty-chip mb-2">
+                    Qty: {{ p|quantity:request.session.cart }}
+                  </div>
+                  <div class="fs-5 fw-bold text-success">
+                    {{ p|total_price:request.session.cart|Currency }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collapsible details -->
+            <div class="collapse" id="product-{{ p.id }}">
+              <div class="card border-0 bg-light-subtle rounded-3 mt-2 mb-3">
+                <div class="card-body p-4">
+                  <div class="row">
+                    <div class="col-md-3 text-center mb-3 mb-md-0">
+                      <img src="{{ p.image.url }}" alt="{{ p.name }}" class="product-img">
+                    </div>
+                    <div class="col-md-9">
+                      <h6 class="fw-bold mb-2">{{ p.name|title }}</h6>
+                      <p class="text-muted mb-2">{{ p.des|title|truncatewords:20 }}</p>
+                      <div class="d-flex align-items-center gap-3">
+                        <div class="qty-chip">
+                          Qty: {{ p|quantity:request.session.cart }}
+                        </div>
+                        <div class="fw-bold fs-5 text-success">
+                          {{ p|total_price:request.session.cart|Currency }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Price Summary -->
+    <div class="row justify-content-center mt-5">
+      <div class="col-lg-8">
+        <div class="admin-card price-summary position-relative">
+          <div class="status-badge">
+            <i class="bi bi-currency-rupee"></i>
+          </div>
+          <div class="row">
+            <div class="col-md-7">
+              <h4 class="fw-bold mb-4 text-success">
+                <i class="bi bi-receipt-long me-2"></i>Price Breakdown
+              </h4>
+              <div class="price-row">
+                <span>Total Items ({{ prods|length }})</span>
+                <span>₹{{ prods|grand_total:request.session.cart }}</span>
+              </div>
+              <div class="price-row text-success">
+                <span><i class="bi bi-truck me-1"></i>Delivery Charges</span>
+                <span>FREE</span>
+              </div>
+              <small class="text-muted mt-2 d-block">
+                Final discounts will be applied on the payment screen.
+              </small>
+            </div>
+            <div class="col-md-5">
+              <div class="price-row">
+                <span>Grand Total</span>
+                <span>₹{{ prods|grand_total:request.session.cart }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center mt-5">
+      <a href="{% url 'payment_gateway' %}">
+        <button class="proceed-btn shadow-lg position-relative overflow-hidden">
+          <span class="spinner-border spinner-border-sm d-none me-3" id="checkoutSpinner"></span>
+          <i class="bi bi-credit-card-2-front-fill me-3 fs-4"></i>
+          Proceed to Payment
+        </button>
+      </a>
+    </div>
+  </div>
+
+  <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script>
+    document.querySelector('.proceed-btn').addEventListener('click', function () {
+      const spinner = document.getElementById('checkoutSpinner');
+      spinner.classList.remove('d-none');
+      this.innerHTML = '<i class="bi bi-credit-card me-3 fs-4"></i>Redirecting...';
+    });
+  </script>
+</body>
+</html>

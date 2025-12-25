@@ -1,0 +1,289 @@
+{% extends "admins/dashbord.html" %}
+{% load static %}
+
+{% block show %}
+<div class="container-fluid mt-4">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold mb-1">
+        <i class="bi bi-people me-2 text-primary"></i>Customers Management
+      </h3>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item">
+            <a href="/admins/dashbord/" class="text-decoration-none">
+              <i class="bi bi-house-door me-1"></i>Product Management
+            </a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">All Customers</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body text-center">
+          <i class="bi bi-people display-4 text-primary mb-2"></i>
+          <h3 class="fw-bold text-primary mb-1">{{ rec|length|default:0 }}</h3>
+          <p class="mb-0 text-muted">Total Customers</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="card shadow-sm border-0 bg-success bg-opacity-10 h-100">
+        <div class="card-body text-center">
+          <i class="bi bi-check-circle display-4 text-success mb-2"></i>
+          <h3 class="fw-bold text-success mb-1">
+            {% for p in rec %}{% if p.status %}{{ forloop.counter }}{% endif %}{% empty %}0{% endfor %}
+          </h3>
+          <p class="mb-0 text-muted">Active</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="card shadow-sm border-0 bg-warning bg-opacity-10 h-100">
+        <div class="card-body text-center">
+          <i class="bi bi-x-circle display-4 text-warning mb-2"></i>
+          <h3 class="fw-bold text-warning mb-1">
+            {% for p in rec %}{% if not p.status %}{{ forloop.counter }}{% endif %}{% empty %}0{% endfor %}
+          </h3>
+          <p class="mb-0 text-muted">Inactive</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="card shadow-sm border-0 bg-info bg-opacity-10 h-100">
+        <div class="card-body text-center">
+          <i class="bi bi-envelope display-4 text-info mb-2"></i>
+          <h3 class="fw-bold text-info mb-1">{{ rec|length|default:0 }}</h3>
+          <p class="mb-0 text-muted">Email Verified</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Filter -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Search Customers</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" id="customerSearch" placeholder="Name, email or phone...">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Status</label>
+          <select class="form-select" id="statusFilter">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+        <div class="col-md-5">
+          <div class="d-flex gap-2 justify-content-md-end">
+            <button class="btn btn-outline-secondary btn-sm" id="clearFilters">
+              <i class="bi bi-arrow-clockwise me-1"></i>Clear
+            </button>
+            <button class="btn btn-outline-success btn-sm">
+              <i class="bi bi-download me-1"></i>Export
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customers Table -->
+  <div class="card shadow-lg border-0">
+    <div class="card-header bg-transparent border-bottom">
+      <h5 class="mb-0 fw-semibold">
+        <i class="bi bi-table me-2"></i>Customers List
+        {% if rec %}
+          <span class="badge bg-primary ms-2">{{ rec|length }} Customers</span>
+        {% endif %}
+      </h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle" id="customersTable">
+          <thead class="table-light sticky-top">
+            <tr>
+              <th class="border-0 fw-semibold py-3"><i class="bi bi-hash me-1"></i>ID</th>
+              <th class="border-0 fw-semibold py-3"><i class="bi bi-person me-1"></i>Name</th>
+              <th class="border-0 fw-semibold py-3"><i class="bi bi-image me-1"></i>Avatar</th>
+              <th class="border-0 fw-semibold py-3"><i class="bi bi-calendar me-1"></i>DOB</th>
+              <th class="border-0 fw-semibold py-3"><i class="bi bi-envelope me-1"></i>Email</th>
+              <th class="border-0 fw-semibold py-3"><i class="bi bi-telephone me-1"></i>Phone</th>
+              <th class="border-0 fw-semibold py-3"><i class="bi bi-circle-fill me-1"></i>Status</th>
+              <th class="border-0 fw-semibold py-3 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="border-top">
+            {% for p in rec %}
+            <tr class="hover-row" data-name="{{ p.fname|lower }} {{ p.lname|lower }}" 
+                data-email="{{ p.email|lower }}" data-phone="{{ p.phone }}" 
+                data-status="{% if p.status %}active{% else %}inactive{% endif %}">
+              <td class="fw-medium">{{ p.id }}</td>
+              <td>
+                <div class="d-flex align-items-center">
+                  {% if p.image %}
+                  <img src="{{ p.image.url }}" alt="{{ p.fname }}" class="rounded-circle avatar-sm me-3 shadow-sm" 
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                  {% else %}
+                  <div class="avatar-sm bg-gradient-primary rounded-circle d-flex align-items-center justify-content-center me-3 text-white fw-semibold">
+                    {{ p.fname.0|upper }}{{ p.lname.0|upper }}
+                  </div>
+                  {% endif %}
+                  <div>
+                    <h6 class="mb-0 fw-semibold">{{ p.fname }} {{ p.lname }}</h6>
+                    <small class="text-muted">Customer ID: {{ p.id }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                {% if p.image %}
+                <img src="{{ p.image.url }}" alt="{{ p.fname }}" class="rounded shadow-sm" 
+                     style="width: 40px; height: 40px; object-fit: cover;" data-bs-toggle="tooltip" 
+                     title="{{ p.fname }} {{ p.lname }}">
+                {% else %}
+                <div class="bg-light rounded-circle p-2 d-flex align-items-center justify-content-center" 
+                     style="width: 40px; height: 40px;">
+                  <i class="bi bi-person-circle text-muted fs-5"></i>
+                </div>
+                {% endif %}
+              </td>
+              <td>
+                <span class="fw-medium">{{ p.dob|date:"M d, Y" }}</span>
+                <br><small class="text-muted">{{ p.dob|date:"l" }}</small>
+              </td>
+              <td>
+                <div>
+                  <span class="fw-semibold d-block mb-1">{{ p.email }}</span>
+                  <span class="badge bg-outline-info py-1 px-2 small">
+                    <i class="bi bi-envelope me-1"></i>Verified
+                  </span>
+                </div>
+              </td>
+              <td>
+                <a href="tel:{{ p.phone }}" class="fw-semibold text-decoration-none">{{ p.phone }}</a>
+              </td>
+              <td>
+                {% if p.status %}
+                <span class="badge bg-success px-3 py-2 fs-6">
+                  <i class="bi bi-check-circle-fill me-1"></i>Active
+                </span>
+                {% else %}
+                <span class="badge bg-secondary px-3 py-2 fs-6">
+                  <i class="bi bi-x-circle me-1"></i>Inactive
+                </span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="btn-group" role="group">
+                  <button class="btn btn-sm btn-outline-primary tooltip-btn" 
+                          data-bs-toggle="tooltip" data-bs-placement="top" title="View Profile"
+                          onclick="alert('View {{ p.fname }} {{ p.lname }} profile')">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-info tooltip-btn" 
+                          data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Customer"
+                          onclick="alert('Edit {{ p.fname }} {{ p.lname }}')">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-warning tooltip-btn" 
+                          data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle Status"
+                          onclick="alert('Toggle status for {{ p.fname }} {{ p.lname }}')">
+                    <i class="bi bi-toggle-on"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" class="text-center py-5">
+                <div class="text-muted">
+                  <i class="bi bi-people display-1 mb-3 opacity-25 d-block mx-auto"></i>
+                  <h5 class="mb-2">No Customers Found</h5>
+                  <p class="mb-4">Get started by adding your first customer.</p>
+                  <a href="#" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Import Customers
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.hover-row:hover {
+  background-color: rgba(0,123,255,.075) !important;
+  transform: scale(1.01);
+  transition: all 0.2s ease;
+}
+.avatar-sm {
+  width: 45px;
+  height: 45px;
+  font-size: 0.875rem;
+}
+.table th {
+  white-space: nowrap;
+}
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+}
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize tooltips
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('.tooltip-btn'));
+  tooltipTriggerList.map(function(tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+
+  // Live search and filter
+  function filterTable() {
+    const search = document.getElementById('customerSearch').value.toLowerCase();
+    const status = document.getElementById('statusFilter').value;
+    
+    document.querySelectorAll('#customersTable tbody tr').forEach(row => {
+      const rowData = row.dataset;
+      const matchesSearch = rowData.name.includes(search) || 
+                          rowData.email.includes(search) || 
+                          rowData.phone.includes(search);
+      const matchesStatus = !status || rowData.status === status;
+      
+      row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+    });
+  }
+
+  document.getElementById('customerSearch').addEventListener('keyup', filterTable);
+  document.getElementById('statusFilter').addEventListener('change', filterTable);
+  
+  document.getElementById('clearFilters').addEventListener('click', function() {
+    document.getElementById('customerSearch').value = '';
+    document.getElementById('statusFilter').value = '';
+    filterTable();
+  });
+});
+</script>
+
+{% endblock show %}

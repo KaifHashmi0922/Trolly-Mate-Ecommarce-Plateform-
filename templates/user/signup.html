@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Trollymate | Signup</title>
+
+    <!-- Admin Assets -->
+    <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+    <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* EXACT SAME COLORS FROM LOGIN/INVOICE */
+            --admin-bg: radial-gradient(circle at top,
+                #e5f0ff 0,
+                #c7ddff 35%,
+                #a5b4fc 70%,
+                #818cf8 100%);
+            --admin-card: rgba(255,255,255,0.98);
+            --admin-shadow: 0 25px 50px rgba(15,23,42,0.14);
+            --admin-glow: 0 0 30px rgba(129,140,248,0.3);
+        }
+        body {
+            background: var(--admin-bg);
+            font-family: 'Nunito', sans-serif;
+            min-height: 100vh;
+        }
+        .admin-header {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            backdrop-filter: blur(20px);
+            border-radius: 24px 24px 0 0;
+            box-shadow: var(--admin-shadow);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .admin-card {
+            backdrop-filter: blur(20px);
+            background: var(--admin-card);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 24px;
+            box-shadow: var(--admin-shadow);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        .admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--admin-glow);
+        }
+        .admin-title {
+            background: linear-gradient(135deg, white, #e0f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            font-size: 2.2rem;
+        }
+        .form-control {
+            border-radius: 16px;
+            border: 2px solid rgba(79,70,229,0.2);
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.8);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .form-control:focus {
+            border-color: #4f46e5;
+            box-shadow: var(--admin-glow);
+            background: white;
+            transform: translateY(-1px);
+        }
+        .admin-btn {
+            border-radius: 50px;
+            font-weight: 700;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border: none;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+        .admin-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--admin-glow);
+        }
+        .status-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(16,185,129,0.4);
+        }
+        .input-group-text {
+            border-radius: 16px 0 0 16px;
+            background: rgba(79,70,229,0.1);
+            border-color: rgba(79,70,229,0.2);
+            color: #4f46e5;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+
+<body class="d-flex align-items-center min-vh-100 py-5">
+    <div class="container">
+        <!-- Breadcrumb Header -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-6 text-center">
+                <div class="admin-header p-4 position-relative">
+                    <div class="status-badge">
+                        <i class="bi bi-person-plus-fill"></i>
+                    </div>
+                    <div class="admin-title mb-2">Create Account</div>
+                    <p class="lead text-white opacity-90 mb-0">Join Trollymate today</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7 col-11">
+                <!-- Error Alert -->
+                {% if msg %}
+                <div class="alert alert-danger alert-dismissible fade show mb-4 position-relative" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ msg }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endif %}
+
+                <!-- Signup Form Card -->
+                <div class="admin-card p-5 position-relative">
+                    <div class="status-badge">
+                        <i class="bi bi-card-checklist"></i>
+                    </div>
+                    <div class="text-center mb-5">
+                        <i class="bi bi-person-badge fs-1 text-primary mb-3"></i>
+                        <h3 class="fw-bold mb-2">Registration Form</h3>
+                        <p class="text-muted lead mb-0">Complete your details to continue</p>
+                    </div>
+
+                    <!-- Signup Form -->
+                    <form method="post" class="needs-validation" novalidate enctype="multipart/form-data" autocomplete="off">
+                        {% csrf_token %}
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">First Name</label>
+                                <input type="text" name="fname" class="form-control form-control-lg" id="fname" required>
+                                <div class="invalid-feedback">Please enter your first name.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" name="lname" class="form-control form-control-lg" id="lname" required>
+                                <div class="invalid-feedback">Please enter your last name.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-envelope"></i>
+                                    </span>
+                                    <input type="email" name="email" class="form-control form-control-lg" id="email" required>
+                                </div>
+                                <div class="invalid-feedback">Please enter a valid email.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Phone Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-telephone"></i>
+                                    </span>
+                                    <input type="tel" name="phone" class="form-control form-control-lg" id="phone" required>
+                                </div>
+                                <div class="invalid-feedback">Please enter your phone number.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-lock-fill"></i>
+                                    </span>
+                                    <input type="password" name="pass1" class="form-control form-control-lg" id="pass1" required>
+                                </div>
+                                <div class="invalid-feedback">Password must be at least 6 characters.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Confirm Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-lock"></i>
+                                    </span>
+                                    <input type="password" name="pass2" class="form-control form-control-lg" id="pass2" required>
+                                </div>
+                                <div class="invalid-feedback">Passwords must match.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" name="dob" class="form-control form-control-lg" id="dob" required>
+                                <div class="invalid-feedback">Please select your date of birth.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Profile Image</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-camera"></i>
+                                    </span>
+                                    <input class="form-control form-control-lg" type="file" id="formFile" name="imag" accept="image/*" required>
+                                </div>
+                                <div class="invalid-feedback">Please upload a profile image.</div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="col-12">
+                                <button class="btn admin-btn w-100 text-white fs-5 py-4 mb-4" type="submit">
+                                    <span class="spinner-border spinner-border-sm d-none me-2" id="signupSpinner"></span>
+                                    <i class="bi bi-person-plus me-2"></i>Create Account
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Login Link -->
+                    <div class="text-center pt-3">
+                        <p class="mb-0 text-muted">
+                            Already have an account? 
+                            <a href="{% url 'login' %}" class="fw-bold text-primary text-decoration-none">
+                                Sign In
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center">
+        <i class="bi bi-arrow-up-short"></i>
+    </a>
+
+    <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+        // Form validation + loading
+        document.querySelector('.needs-validation').addEventListener('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            this.classList.add('was-validated');
+            document.getElementById('signupSpinner').classList.remove('d-none');
+        });
+    </script>
+</body>
+</html>

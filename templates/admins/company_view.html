@@ -1,0 +1,577 @@
+{% extends "admins/dashbord.html" %}
+{% load static %}
+
+{% block show %}
+<div class="container-fluid mt-4">
+  <!-- 🔥 ENHANCED PAGE HEADER -->
+  <div class="header-section mb-5">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-8">
+        <div class="d-flex align-items-center mb-3">
+          <div class="brand-logo me-3">
+            <i class="bi bi-building fs-2"></i>
+          </div>
+          <div>
+            <h2 class="mb-1 fw-bold lh-1">Companies Management</h2>
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb breadcrumb-sm mb-0 p-0">
+                <li class="breadcrumb-item">
+                  <a href="/admins/dashbord/" class="text-decoration-none text-muted">
+                    <i class="bi bi-house-door me-1"></i>Dashboard
+                  </a>
+                </li>
+                <li class="breadcrumb-item">
+                  <a href="/admins/view_companys/" class="text-decoration-none text-muted">
+                    <i class="bi bi-buildings me-1"></i>Companies
+                  </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">View All</li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        <div class="d-flex gap-2 justify-content-lg-end flex-wrap">
+          <a href="/admins/company_add/" class="btn btn-primary px-4">
+            <i class="bi bi-plus-circle me-2"></i>Add Company
+          </a>
+          <button class="btn btn-outline-secondary" data-bs-toggle="offcanvas" data-bs-target="#filterCanvas">
+            <i class="bi bi-funnel me-1"></i>Filters
+          </button>
+          <button class="btn btn-outline-success" id="exportBtn">
+            <i class="bi bi-download me-1"></i>Export
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔥 ADVANCED STATS CARDS -->
+  <section class="row g-4 mb-5">
+    <div class="col-xl-3 col-md-6">
+      <div class="stats-card h-100 animate-on-scroll">
+        <div class="brand-logo mb-3">
+          <i class="bi bi-building"></i>
+        </div>
+        <h2 class="fw-bold display-5 mb-1 text-primary" data-target="{{ rec|length|default:0 }}">0</h2>
+        <p class="mb-2 text-muted fs-6">Total Companies</p>
+        <div class="progress" style="height: 6px;">
+          <div class="progress-bar bg-primary" style="width: 78%"></div>
+        </div>
+        <small class="text-success"><i class="bi bi-arrow-up me-1"></i>12% growth</small>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="stats-card h-100 animate-on-scroll">
+        <div class="brand-logo mb-3" style="background: var(--success-gradient);">
+          <i class="bi bi-check-circle"></i>
+        </div>
+        <h2 class="fw-bold display-5 mb-1 text-success" data-target="{% for p in rec %}{% if p.status %}{{ forloop.counter }}{% endif %}{% empty %}0{% endfor %}">0</h2>
+        <p class="mb-2 text-muted fs-6">Active Companies</p>
+        <div class="progress" style="height: 6px;">
+          <div class="progress-bar bg-success" style="width: 92%"></div>
+        </div>
+        <small class="text-success"><i class="bi bi-arrow-up me-2"></i>8% increase</small>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="stats-card h-100 animate-on-scroll">
+        <div class="brand-logo mb-3" style="background: var(--warning-gradient);">
+          <i class="bi bi-x-circle"></i>
+        </div>
+        <h2 class="fw-bold display-5 mb-1 text-warning" data-target="{% for p in rec %}{% if not p.status %}{{ forloop.counter }}{% endif %}{% empty %}0{% endfor %}">0</h2>
+        <p class="mb-2 text-muted fs-6">Inactive Companies</p>
+        <div class="progress" style="height: 6px;">
+          <div class="progress-bar bg-warning" style="width: 45%"></div>
+        </div>
+        <small class="text-primary"><i class="bi bi-arrow-down me-1"></i>3 inactive</small>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="stats-card h-100 animate-on-scroll">
+        <div class="brand-logo mb-3" style="background: var(--secondary-gradient);">
+          <i class="bi bi-tags"></i>
+        </div>
+        <h2 class="fw-bold display-5 mb-1 text-info" data-target="{{ rec|length|default:0 }}">0</h2>
+        <p class="mb-2 text-muted fs-6">Categories</p>
+        <div class="progress" style="height: 6px;">
+          <div class="progress-bar bg-info" style="width: 67%"></div>
+        </div>
+        <small class="text-success"><i class="bi bi-arrow-up me-1"></i>{{ rec|length }} unique</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🔥 ADVANCED SEARCH & FILTER CANVAS -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="filterCanvas" aria-labelledby="filterCanvasLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="filterCanvasLabel">
+        <i class="bi bi-funnel me-2"></i>Advanced Filters
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+      <form id="filterForm">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Search Companies</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" id="searchInput" placeholder="Company name, category...">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Status</label>
+          <select class="form-select" id="statusFilter">
+            <option value="">All Status</option>
+            <option value="1">Active</option>
+            <option value="0">Inactive</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Category</label>
+          <select class="form-select" id="categoryFilter">
+            <option value="">All Categories</option>
+            {% for p in rec %}
+              <option value="{{ p.category }}">{{ p.category }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-primary">Apply Filters</button>
+          <button type="button" class="btn btn-outline-secondary" id="clearFilters">Clear All</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 🔥 ENHANCED COMPANIES TABLE -->
+  <div class="card shadow-lg border-0 overflow-hidden">
+    <div class="card-header bg-gradient-primary text-white py-4 position-relative overflow-hidden">
+      <div class="row align-items-center">
+        <div class="col">
+          <h4 class="mb-0 fw-bold">
+            <i class="bi bi-table me-2"></i>Companies Directory
+          </h4>
+          <small class="opacity-75">Manage all registered companies</small>
+        </div>
+        <div class="col-auto">
+          <span class="badge bg-light text-dark fs-6 fw-semibold">
+            {{ rec|length|default:0 }} Companies
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 modern-table">
+          <thead class="table-dark sticky-top">
+            <tr>
+              <th class="border-0 fw-semibold py-4">
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-hash me-2"></i>ID
+                  <i class="bi bi-chevron-down ms-auto small opacity-75"></i>
+                </div>
+              </th>
+              <th class="border-0 fw-semibold py-4">
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-building me-2"></i>Company
+                  <i class="bi bi-chevron-down ms-auto small opacity-75"></i>
+                </div>
+              </th>
+              <th class="border-0 fw-semibold py-4">
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-tags me-2"></i>Category
+                  <i class="bi bi-chevron-down ms-auto small opacity-75"></i>
+                </div>
+              </th>
+              <th class="border-0 fw-semibold py-4">Description</th>
+              <th class="border-0 fw-semibold py-4 text-center">
+                <i class="bi bi-image me-1"></i>Logo
+              </th>
+              <th class="border-0 fw-semibold py-4">
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-circle-fill me-2"></i>Status
+                  <i class="bi bi-chevron-down ms-auto small opacity-75"></i>
+                </div>
+              </th>
+              <th class="border-0 fw-semibold py-4 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="companiesTableBody">
+            {% for p in rec %}
+            <tr class="table-row animate-on-scroll" data-company-id="{{ p.id }}" data-status="{{ p.status }}" data-category="{{ p.category }}">
+              <td class="fw-semibold text-primary">{{ p.id }}</td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="company-avatar me-3">
+                    {% if p.image %}
+                    <img src="{{ p.image.url }}" alt="{{ p.name }}" class="rounded-3 shadow-sm" 
+                         style="width: 50px; height: 50px; object-fit: cover;">
+                    {% else %}
+                    <div class="bg-gradient-primary rounded-3 d-flex align-items-center justify-content-center text-white fw-bold fs-6"
+                         style="width: 50px; height: 50px;">
+                      {{ p.name|first|upper }}
+                    </div>
+                    {% endif %}
+                  </div>
+                  <div class="flex-grow-1 min-w-0">
+                    <h6 class="mb-1 fw-semibold lh-1">{{ p.name }}</h6>
+                    <small class="text-muted d-block">{{ p.category }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-gradient-primary px-3 py-2 fw-semibold">
+                  {{ p.category }}
+                </span>
+              </td>
+              <td class="text-truncate" style="max-width: 220px;" data-bs-toggle="tooltip" data-bs-title="{{ p.des }}">
+                <span class="text-muted">{{ p.des|truncatewords:12 }}</span>
+              </td>
+              <td class="text-center">
+                {% if p.image %}
+                <div class="logo-preview cursor-pointer" data-bs-toggle="modal" data-bs-target="#imageModal{{ p.id }}">
+                  <img src="{{ p.image.url }}" alt="{{ p.name }}" class="rounded shadow border" 
+                       style="width: 45px; height: 45px; object-fit: cover; cursor: zoom-in;"
+                       data-bs-toggle="tooltip" data-bs-title="Click to enlarge">
+                </div>
+                {% else %}
+                <div class="bg-light rounded-3 p-2 d-flex align-items-center justify-content-center">
+                  <i class="bi bi-image text-muted fs-4"></i>
+                </div>
+                {% endif %}
+              </td>
+              <td>
+                {% if p.status %}
+                <span class="badge bg-success px-4 py-2 fw-semibold status-badge">
+                  <i class="bi bi-check-circle-fill me-1"></i>Active
+                </span>
+                {% else %}
+                <span class="badge bg-secondary px-4 py-2 fw-semibold status-badge">
+                  <i class="bi bi-x-circle-fill me-1"></i>Inactive
+                </span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <div class="btn-group btn-group-sm" role="group">
+                  <a href="/admins/company_edit/{{p.id}}" 
+                     class="btn btn-outline-primary tooltip-btn" 
+                     data-bs-toggle="tooltip" data-bs-title="Edit Company">
+                    <i class="bi bi-pencil-square"></i>
+                  </a>
+                  <button class="btn btn-outline-warning tooltip-btn toggle-status" 
+                          data-bs-toggle="tooltip" data-bs-title="{% if p.status %}Deactivate{% else %}Activate{% endif %}"
+                          data-company-id="{{ p.id }}" data-current-status="{{ p.status }}">
+                    <i class="bi {% if p.status %}bi-pause-circle{% else %}bi-play-circle{% endif %}"></i>
+                  </button>
+                  <a href="/admins/company_delete/{{p.id}}" 
+                     class="btn btn-outline-danger tooltip-btn" 
+                     data-bs-toggle="tooltip" data-bs-title="Delete Company"
+                     onclick="return confirmAction('Delete {{ p.name }}?', this.href)">
+                    <i class="bi bi-trash"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr class="text-center">
+              <td colspan="7" class="py-8">
+                <div class="empty-state">
+                  <div class="empty-icon mb-4">
+                    <i class="bi bi-buildings display-1 text-muted opacity-25"></i>
+                  </div>
+                  <h4 class="mb-3 fw-bold text-muted">No Companies Found</h4>
+                  <p class="text-muted mb-4">Start building your company directory.</p>
+                  <a href="/admins/company_add/" class="btn btn-primary btn-lg px-5">
+                    <i class="bi bi-plus-circle me-2"></i>Add First Company
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔥 IMAGE MODAL -->
+  {% for p in rec %}
+  {% if p.image %}
+  <div class="modal fade" id="imageModal{{ p.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-body p-0">
+          <img src="{{ p.image.url }}" alt="{{ p.name }}" class="img-fluid w-100 rounded-top cursor-pointer">
+          <div class="p-3 text-center">
+            <h6 class="mb-1">{{ p.name }}</h6>
+            <small class="text-muted">{{ p.category }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  {% endfor %}
+
+  <!-- 🔥 PAGINATION -->
+  {% if rec %}
+  <nav class="mt-5" aria-label="Companies pagination">
+    <ul class="pagination pagination-lg justify-content-center gap-1">
+      <li class="page-item">
+        <a class="page-link rounded-pill" href="#" style="min-width: 50px;">
+          <i class="bi bi-chevron-left"></i>
+        </a>
+      </li>
+      <li class="page-item active">
+        <span class="page-link rounded-pill fw-bold">1</span>
+      </li>
+      <li class="page-item">
+        <a class="page-link rounded-pill" href="#">2</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link rounded-pill" href="#">3</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link rounded-pill" href="#" style="min-width: 50px;">
+          <i class="bi bi-chevron-right"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+
+<style>
+:root {
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.bg-gradient-primary {
+  background: var(--primary-gradient) !important;
+}
+
+.modern-table tbody tr:hover {
+  background: linear-gradient(90deg, rgba(102,126,234,0.08), rgba(102,126,234,0.04)) !important;
+  transform: scale(1.01);
+  box-shadow: 0 4px 20px rgba(102,126,234,0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.company-avatar img {
+  transition: all 0.3s ease;
+}
+
+.company-avatar:hover img {
+  transform: scale(1.1);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.status-badge {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.status-badge:hover {
+  transform: scale(1.05);
+}
+
+.empty-state {
+  opacity: 0;
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease;
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.breadcrumb-sm .breadcrumb-item + .breadcrumb-item::before {
+  font-size: 0.875rem;
+}
+
+.btn-group .btn {
+  border-radius: 8px !important;
+  transition: all 0.2s ease;
+}
+
+.btn-group .btn:hover {
+  transform: translateY(-1px);
+}
+
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+.logo-preview:hover {
+  transform: scale(1.1);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // 🔥 Initialize all tooltips
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  tooltipTriggerList.forEach(tooltipTriggerEl => {
+    new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+
+  // 🔥 Advanced search & filter
+  const searchInput = document.getElementById('searchInput');
+  const statusFilter = document.getElementById('statusFilter');
+  const categoryFilter = document.getElementById('categoryFilter');
+  const rows = document.querySelectorAll('.table-row');
+
+  function filterRows() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const status = statusFilter.value;
+    const category = categoryFilter.value.toLowerCase();
+
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      const rowStatus = row.dataset.status;
+      const rowCategory = row.dataset.category.toLowerCase();
+
+      const matchesSearch = text.includes(searchTerm);
+      const matchesStatus = !status || rowStatus === status;
+      const matchesCategory = !category || rowCategory.includes(category);
+
+      row.style.display = (matchesSearch && matchesStatus && matchesCategory) ? '' : 'none';
+    });
+  }
+
+  searchInput.addEventListener('input', filterRows);
+  statusFilter.addEventListener('change', filterRows);
+  categoryFilter.addEventListener('change', filterRows);
+
+  document.getElementById('clearFilters').addEventListener('click', () => {
+    searchInput.value = '';
+    statusFilter.value = '';
+    categoryFilter.value = '';
+    filterRows();
+  });
+
+  // 🔥 Animate counters
+  const animateCounters = () => {
+    document.querySelectorAll('[data-target]').forEach(counter => {
+      const target = parseInt(counter.dataset.target);
+      let current = 0;
+      const duration = 2000;
+      const increment = target / (duration / 16);
+
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          counter.textContent = target.toLocaleString();
+          clearInterval(timer);
+        } else {
+          counter.textContent = Math.floor(current).toLocaleString();
+        }
+      }, 16);
+    });
+  };
+
+  // 🔥 Scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        if (entry.target.closest('.stats-card')) {
+          animateCounters();
+        }
+      }
+    });
+  });
+
+  document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+  // 🔥 Export functionality
+  document.getElementById('exportBtn').addEventListener('click', function() {
+    const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+    if (visibleRows.length === 0) {
+      alert('No data to export!');
+      return;
+    }
+    
+    const csvContent = generateCSV(visibleRows);
+    downloadCSV(csvContent, 'companies.csv');
+  });
+
+  function generateCSV(rows) {
+    let csv = 'ID,Company Name,Category,Status,Description\n';
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      const rowData = Array.from(cells).slice(0, 5).map(cell => 
+        `"${cell.textContent.trim().replace(/"/g, '""')}"`
+      ).join(',');
+      csv += rowData + '\n';
+    });
+    return csv;
+  }
+
+  function downloadCSV(csv, filename) {
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  // 🔥 Confirm delete with better UX
+  window.confirmAction = function(message, url) {
+    if (confirm(message)) {
+      return true;
+    }
+    return false;
+  };
+
+  // 🔥 Status toggle (AJAX)
+  document.querySelectorAll('.toggle-status').forEach(btn => {
+    btn.addEventListener('click', async function() {
+      const companyId = this.dataset.companyId;
+      const currentStatus = this.dataset.currentStatus;
+      
+      try {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 500));
+        this.closest('tr').dataset.status = currentStatus === '1' ? '0' : '1';
+        filterRows();
+        
+        // Update button
+        const icon = this.querySelector('i');
+        if (currentStatus === '1') {
+          icon.className = 'bi bi-play-circle';
+          this.dataset.bsTitle = 'Activate';
+        } else {
+          icon.className = 'bi bi-pause-circle';
+          this.dataset.bsTitle = 'Deactivate';
+        }
+        
+        bootstrap.Tooltip.getInstance(this).setContent({ '.tooltip-inner': 'Status updated!' });
+      } catch (error) {
+        alert('Error updating status');
+      }
+    });
+  });
+});
+</script>
+{% endblock show %}

@@ -1,0 +1,213 @@
+{% extends "admins/dashbord.html" %}
+{% load static %}
+
+{% block show %}
+
+<div class="container-fluid py-4">
+
+  <!-- HEADER -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="fw-bold mb-1">
+        <i class="bi bi-exclamation-triangle text-warning"></i> Low Stock Alert
+      </h2>
+      <p class="text-muted">Products with stock less than 10 units</p>
+    </div>
+  </div>
+
+  <!-- ALERTS SUMMARY -->
+  <div class="row mb-4">
+    <div class="col-lg-4 mb-3">
+      <div class="card border-0 shadow-sm bg-danger text-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <p class="mb-1 small">Critical Stock (< 5)</p>
+              <h3 class="fw-bold mb-0">{{ total_critical|default:0 }}</h3>
+            </div>
+            <i class="bi bi-exclamation-circle fs-4"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 mb-3">
+      <div class="card border-0 shadow-sm bg-warning text-dark h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <p class="mb-1 small">Low Stock (5-10)</p>
+              <h3 class="fw-bold mb-0">{{ total_warning|default:0 }}</h3>
+            </div>
+            <i class="bi bi-exclamation-triangle fs-4"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 mb-3">
+      <div class="card border-0 shadow-sm bg-info text-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <p class="mb-1 small">Total Low Stock (≤10)</p>
+              <h3 class="fw-bold mb-0">{{ total_low_stock|default:0 }}</h3>
+            </div>
+            <i class="bi bi-graph-down fs-4"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRITICAL STOCK TABLE -->
+  {% if critical_stock %}
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-danger text-white">
+          <h6 class="mb-0 fw-bold">
+            <i class="bi bi-exclamation-circle"></i> CRITICAL - Immediate Restock Needed (< 5)
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Product</th>
+                  <th>Company</th>
+                  <th>Current Stock</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for prod in critical_stock %}
+                <tr class="table-danger">
+                  <td>
+                    <strong>{{ prod.name }}</strong>
+                    <br>
+                    <small class="text-muted">{{ prod.des }}</small>
+                  </td>
+                  <td>{{ prod.company.name }}</td>
+                  <td>
+                    <h5 class="mb-0">
+                      <span class="badge bg-danger">{{ prod.quantity }}</span>
+                    </h5>
+                  </td>
+                  <td>₹{{ prod.price }}</td>
+                  <td>
+                    <span class="badge bg-danger">
+                      <i class="bi bi-exclamation-circle"></i> Critical
+                    </span>
+                  </td>
+                  <td>
+                    <a href="/admins/edit_product/{{ prod.id }}/" class="btn btn-sm btn-warning">
+                      <i class="bi bi-pencil"></i> Restock
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- LOW STOCK TABLE -->
+  {% if warning_stock %}
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-warning">
+          <h6 class="mb-0 fw-bold">
+            <i class="bi bi-exclamation-triangle"></i> LOW STOCK - Restock Soon (5-10)
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Product</th>
+                  <th>Company</th>
+                  <th>Current Stock</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for prod in warning_stock %}
+                <tr style="background-color: #fff3cd;">
+                  <td>
+                    <strong>{{ prod.name }}</strong>
+                    <br>
+                    <small class="text-muted">{{ prod.des }}</small>
+                  </td>
+                  <td>{{ prod.company.name }}</td>
+                  <td>
+                    <h5 class="mb-0">
+                      <span class="badge bg-warning">{{ prod.quantity }}</span>
+                    </h5>
+                  </td>
+                  <td>₹{{ prod.price }}</td>
+                  <td>
+                    <span class="badge bg-warning text-dark">
+                      <i class="bi bi-exclamation-triangle"></i> Low
+                    </span>
+                  </td>
+                  <td>
+                    <a href="/admins/edit_product/{{ prod.id }}/" class="btn btn-sm btn-info">
+                      <i class="bi bi-pencil"></i> Update
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- EMPTY STATE -->
+  {% if not low_stock_prods %}
+  <div class="row">
+    <div class="col-12">
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i>
+        <strong>All products have healthy stock!</strong> No low stock items at the moment.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<style>
+  .table-danger {
+    border-left: 4px solid #dc3545;
+  }
+  
+  tr[style*="background-color"] {
+    border-left: 4px solid #ffc107;
+  }
+  
+  .badge {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+  }
+</style>
+
+{% endblock show %}
+
+---

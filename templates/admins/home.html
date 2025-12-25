@@ -1,0 +1,110 @@
+{% extends "admins/dashbord.html" %}
+{% load static %}
+
+{% block title %}Trolley Mate - Admin Home{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<section class="header-section">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-8">
+            <h1 class="display-5 fw-bold mb-3 lh-1">
+                Welcome back, <span class="text-primary">Admin!</span>
+            </h1>
+            <p class="lead mb-0 text-muted fs-5">
+                Complete control over your eCommerce platform. 
+                Quick actions available in the sidebar.
+            </p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <div class="d-flex gap-2 justify-content-lg-end flex-wrap">
+                <a href="/admins/addproduct/" class="btn btn-outline-primary px-4 py-2">
+                    <i class="bi bi-plus-circle me-2"></i>New Product
+                </a>
+                <a href="/admins/analytics/" class="btn btn-primary px-4 py-2">
+                    <i class="bi bi-graph-up me-2"></i>View Analytics
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Stats -->
+<section class="row g-4 mb-5">
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card h-100">
+            <div class="brand-logo mb-3">
+                <i class="bi bi-people"></i>
+            </div>
+            <h2 class="fw-bold display-5 mb-1 text-primary" data-target="{{ total_customers|default:0 }}">0</h2>
+            <p class="mb-2 text-muted fs-6">Total Customers</p>
+            <small class="text-success"><i class="bi bi-arrow-up me-1"></i>12% from last month</small>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card h-100">
+            <div class="brand-logo mb-3" style="background: var(--success-gradient);">
+                <i class="bi bi-building"></i>
+            </div>
+            <h2 class="fw-bold display-5 mb-1 text-success" data-target="{{ total_companies|default:0 }}">0</h2>
+            <p class="mb-2 text-muted fs-6">Total Companies</p>
+            <small class="text-success"><i class="bi bi-arrow-up me-2"></i>8% growth</small>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card h-100">
+            <div class="brand-logo mb-3" style="background: var(--warning-gradient);">
+                <i class="bi bi-box-seam"></i>
+            </div>
+            <h2 class="fw-bold display-5 mb-1 text-warning" data-target="{{ total_products|default:0 }}">0</h2>
+            <p class="mb-2 text-muted fs-6">Total Products</p>
+            <small class="text-primary"><i class="bi bi-arrow-up me-1"></i>15 new</small>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card h-100">
+            <div class="brand-logo mb-3" style="background: var(--secondary-gradient);">
+                <i class="bi bi-cart-check"></i>
+            </div>
+            <h2 class="fw-bold display-5 mb-1 text-danger" data-target="{{ total_orders|default:0 }}">0</h2>
+            <p class="mb-2 text-muted fs-6">Total Orders</p>
+            <small class="text-success"><i class="bi bi-arrow-up me-1"></i>22 today</small>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Actions -->
+<section class="show-content text-center py-5">
+    <div class="brand-logo mx-auto mb-4" style="width: 120px; height: 120px; font-size: 3rem; background: rgba(255,255,255,0.2);">
+        <i class="bi bi-cart-check"></i>
+    </div>
+    <h2 class="display-5 fw-bold mb-3 text-white position-relative" style="text-shadow: 0 2px 10px rgba(0,0,0,0.3);">Quick Actions</h2>
+    <p class="lead mb-4 opacity-90 fs-5">Choose what you want to manage today</p>
+    <div class="row g-3 justify-content-center">
+        <div class="col-md-3 col-sm-6">
+            <a href="/admins/addproduct/" class="btn btn-primary btn-lg w-100 p-4 shadow-lg h-100 d-flex flex-column align-items-center">
+                <i class="bi bi-plus-circle fs-1 mb-2"></i>
+                <span class="fw-bold">Add Product</span>
+            </a>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <a href="/admins/admins_viewproduct/" class="btn btn-outline-light btn-lg w-100 p-4 shadow h-100 d-flex flex-column align-items-center">
+                <i class="bi bi-eye fs-1 mb-2"></i>
+                <span class="fw-bold">View Products</span>
+            </a>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <a href="/admins/view_companys/" class="btn btn-success btn-lg w-100 p-4 shadow-lg h-100 d-flex flex-column align-items-center">
+                <i class="bi bi-building fs-1 mb-2"></i>
+                <span class="fw-bold">Manage Companies</span>
+            </a>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <a href="/admins/view_custmers/" class="btn btn-info btn-lg w-100 p-4 shadow h-100 d-flex flex-column align-items-center">
+                <i class="bi bi-people fs-1 mb-2"></i>
+                <span class="fw-bold">View Customers</span>
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
