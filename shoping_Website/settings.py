@@ -9,21 +9,26 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-import os
+
 from pathlib import Path
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# import dj_database_url
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'django-insecure-w6626#x-6kp-y%lv1@ggwlu%%aigf1ish&95r=#m!1g59u0qmz'
 
-DEBUG = 'False'
-ALLOWED_HOSTS = ['*']
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
 
-SECRET_KEY = 'django-insecure-9k!l@#x$y%_replace_this_with_any_long_random_string'
-SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret-key-for-dev")
+ALLOWED_HOSTS = []
 
+
+# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -40,7 +45,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -55,7 +59,7 @@ ROOT_URLCONF = 'shoping_Website.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-         'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': ["templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -72,6 +76,9 @@ WSGI_APPLICATION = 'shoping_Website.wsgi.application'
 AUTH_USER_MODEL = "accounts.User"
 
 
+LOGIN_REDIRECT_URL = 'admins:dashboard'  # app_name 'admins', url name 'dashboard'
+LOGIN_URL = 'admin_login'  # your admin login url name stays same
+
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -83,33 +90,24 @@ LOGIN_REDIRECT_URL = "dashbord"
 
 
 
-IS_PRODUCTION = os.environ.get('RENDER') == 'true'
-
-if IS_PRODUCTION:
-    # 🔵 DEPLOY DATABASE (Render / Production)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ.get('bixpyoq4qb6tzhkvxiyh'),
-            'USER': os.environ.get('u1n8nhuablnatowr'),
-            'PASSWORD': os.environ.get('AjcE1S2hz680FU3Ln6Nw'),
-            'HOST': os.environ.get('bixpyoq4qb6tzhkvxiyh-mysql.services.clever-cloud.com'),
-            'PORT': os.environ.get('3306'),
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
-    # 🟢 LOCAL DATABASE
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'shoping_website',
-            'USER': 'root',
-            'PASSWORD': 'root',
-            'HOST': 'localhost',
-            'PORT': '3306',
-        }
-    }
+}
 
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'shoping_website',   
+#         'USER': 'root',
+#         'PASSWORD':'root',
+#         'PORT':3306,
+#         'HOST':'localhost',
+#     }
+# }
 
 
 # Password validation
@@ -152,23 +150,15 @@ EMAIL_HOST_PASSWORD='sphe dped mfdb ooit'
 
 
 
-
-# Local default = True, in Render set DEBUG=False
- #SECURITY WARNING: don't run with debug turned on in production!
-
-
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # Your local static folder
+STATIC_URL = 'static/'
+STATICFILES_DIRS=[
+    BASE_DIR,'static'
 ]
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-# Media files (user uploads)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
+MEDIA_URL='/media/'
+MEDIA_ROOT=BASE_DIR/'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

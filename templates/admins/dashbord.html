@@ -403,37 +403,30 @@
                         <!-- Profile Header -->
                         <li class="profile-header">
                             <div class="profile-avatar-large">
-                                <i class="bi bi-person-circle fs-1"></i>
+                                {% if request.user.profile_picture %}
+                                    <img src="{{ request.user.profile_picture.url }}" alt="Profile" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                                {% else %}
+                                    <i class="bi bi-person-circle fs-1 text-primary"></i>
+                                {% endif %}
                             </div>
-                            <div class="profile-name">Super Admin</div>
-                            <div class="profile-email">admin@trolleymate.com</div>
+                            <div>
+                                <div class="profile-name fw-bold">{{ request.user.get_username|default:request.user.email|slice:":15" }}</div>
+                                <div class="profile-email text-muted small">{{ request.user.email }}</div>
+                                <div class="profile-role text-primary small fw-semibold mt-1">
+                                    {{ request.user.get_role_display|default:request.user.role }}
+                                </div>
+                            </div>
                         </li>
-                        
+
                         <!-- Profile Items WITH LINKS -->
                         <li><a class="profile-item" href="/admins/admin_profile/" target="_blank">
                             <i class="bi bi-person-circle fs-4 text-primary"></i>
                             <span>My Profile</span>
                         </a></li>
                         
-                        <li><a class="profile-item" href="/admins/admin_profile/">
-                            <i class="bi bi-gear fs-4 text-warning"></i>
-                            <span>Settings</span>
-                        </a></li>
-                        
-                        <li><a class="profile-item" href="/admins/admin_profile/">
-                            <i class="bi bi-shield-check fs-4 text-success"></i>
-                            <span>Account Security</span>
-                        </a></li>
-                        
-                        <li><a class="profile-item" href="/admins/admin_profile/">
-                            <i class="bi bi-activity fs-4 text-info"></i>
-                            <span>Activity Log</span>
-                        </a></li>
-                        
-                        <li><hr class="dropdown-divider my-0"></li>
-                    </a>
+                     
 
-                        <li><a class="profile-item text-danger" href="/admins/logout/">
+                        <li><a class="profile-item text-danger" href="/admins/adminlogout/">
                             <i class="bi bi-box-arrow-right fs-4"></i>
                             <span>Logout</span>
                         </a></li>
@@ -447,13 +440,7 @@
     <!-- ======= Sidebar ======= -->
     <aside id="sidebar" class="sidebar d-lg-block">
         <!-- 🔥 NEW ADMIN PROFILE HEADER -->
-        <div class="admin-profile-header">
-            <div class="admin-avatar">
-                <i class="bi bi-person-shield"></i>
-            </div>
-            <div class="admin-name">Super Admin</div>
-            <div class="admin-role">Platform Owner</div>
-        </div>
+        
 
         <div class="sidebar-header">
             <h3 class="mb-2 fw-bold fs-4 lh-1">Dashboard</h3>
@@ -462,13 +449,13 @@
 
         <div class="px-3 pb-4">
             <!-- Navigation Items -->
-            <a href="/admins/add_company/" class="sidebar-nav-item">
+            <a href="/admins/company_add/" class="sidebar-nav-item">
                 <i class="bi bi-building-gear"></i> Add Company
             </a>
-            <a href="/admins/view_companys/" class="sidebar-nav-item">
+            <a href="/admins/companys_view/" class="sidebar-nav-item">
                 <i class="bi bi-buildings"></i> View Companies
             </a>
-            <a href="/admins/addproduct/" class="sidebar-nav-item">
+            <a href="/admins/product_add/" class="sidebar-nav-item">
                 <i class="bi bi-plus-circle"></i> Add Product
             </a>
             <a href="/admins/admins_viewproduct/" class="sidebar-nav-item">
@@ -522,7 +509,7 @@
                     </div>
                     <div class="col-lg-4 text-lg-end">
                         <div class="d-flex gap-2 justify-content-lg-end flex-wrap">
-                            <a href="/admins/addproduct/" class="btn btn-outline-primary px-4 py-2">
+                            <a href="/admins/product_add/" class="btn btn-outline-primary px-4 py-2">
                                 <i class="bi bi-plus-circle me-2"></i>New Product
                             </a>
                             <a href="/admins/analytics/" class="btn btn-primary px-4 py-2">
@@ -592,7 +579,7 @@
             <!-- Quick Action Buttons -->
             <section class="row g-4 mb-5 justify-content-center">
                 <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
-                    <a href="/admins/addproduct/" class="btn btn-primary btn-lg w-100 p-4 shadow-lg h-100 d-flex flex-column align-items-center text-decoration-none">
+                    <a href="/admins/product_add/" class="btn btn-primary btn-lg w-100 p-4 shadow-lg h-100 d-flex flex-column align-items-center text-decoration-none">
                         <i class="bi bi-plus-circle fs-1 mb-3 text-white"></i>
                         <span class="fw-bold fs-5 text-white">Add Product</span>
                     </a>
@@ -604,7 +591,7 @@
                     </a>
                 </div>
                 <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
-                    <a href="/admins/view_companys/" class="btn btn-success btn-lg w-100 p-4 shadow-lg h-100 d-flex flex-column align-items-center text-decoration-none">
+                    <a href="/admins/companys_view/" class="btn btn-success btn-lg w-100 p-4 shadow-lg h-100 d-flex flex-column align-items-center text-decoration-none">
                         <i class="bi bi-building fs-1 mb-3 text-white"></i>
                         <span class="fw-bold fs-5 text-white">Companies</span>
                     </a>

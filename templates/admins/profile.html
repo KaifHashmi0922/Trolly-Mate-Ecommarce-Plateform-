@@ -1,0 +1,199 @@
+{% extends "admins/dashbord.html" %}
+{% load static %}
+
+{% block show %}
+<!-- Admin Profile Header -->
+<div class="header-section mb-5">
+    <div class="row align-items-center">
+        <div class="col-lg-8">
+            <h1 class="display-5 fw-bold mb-2">
+                <i class="bi bi-person-circle me-2 text-primary"></i>
+                My Profile
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'admins:dashboard' %}">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Profile
+                    </li>
+                </ol>
+            </nav>
+            <p class="text-muted mt-2">
+                View your admin information, store stats, and recent activity.
+            </p>
+        </div>
+        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+            <!-- Safe button (no broken URL) -->
+            <a href="{% url 'admins:admin_profile_update' %}" class="btn btn-primary px-4">
+                <i class="bi bi-pencil me-2"></i>Edit Profile
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Profile & Account Info -->
+<section class="row g-4 mb-5">
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    {% if request.user.profile_picture %}
+                        <img src="{{ request.user.profile_picture.url }}"
+                             alt="Profile picture"
+                             class="rounded-circle border"
+                             style="width: 96px; height: 96px; object-fit: cover;">
+                    {% else %}
+                        <i class="bi bi-person-circle text-primary" style="font-size: 4rem;"></i>
+                    {% endif %}
+                </div>
+                <h4 class="fw-bold mb-1">
+                    {{ request.user.get_full_name|default:request.user.username }}
+                </h4>
+                <p class="text-muted mb-1">
+                    {{ request.user.email }}
+                </p>
+                <span class="badge bg-primary-subtle text-primary">
+                    {{ request.user.get_role_display|default:"Admin" }}
+                </span>
+            </div>
+            <div class="card-footer bg-light">
+                <div class="d-flex justify-content-between small text-muted">
+                    <span>Joined</span>
+                    <span>{{ request.user.date_joined|date:"M d, Y" }}</span>
+                </div>
+                <div class="d-flex justify-content-between small text-muted mt-1">
+                    <span>Last login</span>
+                    <span>{{ request.user.last_login|date:"M d, Y H:i" |default:"Never" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Store KPIs -->
+    <div class="col-lg-8">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small">Total Customers</span>
+                            <span class="text-primary">
+                                <i class="bi bi-people-fill"></i>
+                            </span>
+                        </div>
+                        <h3 class="fw-bold mb-0">{{ total_customers|default:0 }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small">Active Products</span>
+                            <span class="text-success">
+                                <i class="bi bi-box-seam"></i>
+                            </span>
+                        </div>
+                        <h3 class="fw-bold mb-0">{{ total_products|default:0 }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small">Approved Companies</span>
+                            <span class="text-warning">
+                                <i class="bi bi-buildings"></i>
+                            </span>
+                        </div>
+                        <h3 class="fw-bold mb-0">{{ total_companies|default:0 }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders today -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted small">Orders Today</span>
+                            <span class="text-info">
+                                <i class="bi bi-cart-check"></i>
+                            </span>
+                        </div>
+                        <h2 class="fw-bold mb-1">{{ today_orders|default:0 }}</h2>
+                        <p class="mb-0 small text-muted">
+                            Yesterday: {{ yesterday_orders|default:0 }} orders
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted small">Revenue Today</span>
+                            <span class="text-danger">
+                                <i class="bi bi-currency-rupee"></i>
+                            </span>
+                        </div>
+                        <h2 class="fw-bold mb-1 text-danger">
+                            ₹{{ today_revenue|default:0 }}
+                        </h2>
+                        <p class="mb-0 small text-muted">
+                            Total Revenue: ₹{{ total_revenue|default:0 }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Activity --><section class="mb-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-activity me-2 text-primary"></i>
+                Recent Activity
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            {% if recent_activities %}
+                <ul class="list-group list-group-flush">
+                    {% for activity in recent_activities %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-bold">
+                                    {{ activity.status|title }} Order #{{ activity.id }}
+                                </div>
+                                <small class="text-muted">
+                                    Product: {{ activity.p_name }} (x{{ activity.p_quantity }})
+                                </small><br>
+                                <small class="text-muted">
+                                    Address: {{ activity.cust_address }}
+                                </small>
+                            </div>
+                            <div class="text-end small text-muted">
+                                <div>₹{{ activity.p_price }}</div>
+                                <div>{{ activity.shop_date|date:"M d, Y" }}</div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="p-3 text-center text-muted">
+                    No recent activity found.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

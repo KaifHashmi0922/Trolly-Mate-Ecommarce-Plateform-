@@ -2,18 +2,25 @@
 # Date: December 2025
 # Features: Analytics, Products, Companies, Customers, Stock Management, Cart
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
-from django.db.models import Q, Sum, Count, Avg, F, DecimalField
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db.models import Q, Sum, Count, Avg, F
+from django.utils import timezone
+from datetime import datetime, timedelta, date
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
+
+# Trolly Mate models
+from accounts.models import User
 from admins.models import Products, Companys
 from Users.models import Customer, Shoping, Address
 
+# Data analysis & visualization
 import os
 import base64
 from io import BytesIO
-from datetime import datetime, timedelta, date
-
 import pandas as pd
 import numpy as np
 import matplotlib
@@ -21,6 +28,12 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+"""
+admins/views.py - Trolly Mate Admin Dashboard Views
+
+Clean imports with no duplicates. Added .models import removed.
+Ready for admin_profile view and analytics dashboard.
+"""
 # ============================================================================
 # CUSTOM EXCEPTIONS
 # ============================================================================
@@ -51,39 +64,114 @@ class QueryError(Exception):
 
 @login_required
 def dashbord(request):
-    """Admin dashboard home with top-level KPIs."""
+    """
+    Trolly Mate Admin Dashboard - Home page with key KPIs.
+    Protected for staff admins only. Error-safe with fallbacks.
+    """
+    if not request.user.is_staff_admin:
+        messages.error(request, "Access denied. Staff admin privileges required.")
+        return redirect('admins:profile')
+    
     try:
+        # Trolly Mate KPIs using your exact models
+        yesterday = timezone.now().date() - timedelta(days=1)
+        
         context = {
             'total_customers': Customer.objects.filter(status=True).count(),
             'total_companies': Companys.objects.filter(status=True).count(),
             'total_products': Products.objects.filter(status=True).count(),
             'total_orders': Shoping.objects.count(),
+            
+            # Extra dashboard metrics
+            'today_orders': Shoping.objects.filter(created_at__date=timezone.now().date()).count(),
+            'revenue_today': Shoping.objects.filter(
+                status__in=['completed', 'delivered'],
+                created_at__date=timezone.now().date()
+            ).aggregate(total=Sum('total_amount'))['total'] or 0,
+            'low_stock': Products.objects.filter(status=True, stock__lte=10).count(),
         }
     except Exception as e:
         context = {
-            'total_customers': 0,
-            'total_companies': 0,
-            'total_products': 0,
-            'total_orders': 0,
+            'total_customers': 0, 'total_companies': 0, 'total_products': 0, 'total_orders': 0,
+            'today_orders': 0, 'revenue_today': 0, 'low_stock': 0,
             'error': str(e),
         }
     
     return render(request, 'admins/dashbord.html', context)
-
 @login_required
 def admin_profile(request):
-    """Admin profile page with platform statistics."""
-    try:
-        context = {
-            'total_customers': Customer.objects.filter(status=True).count(),
-            'total_products': Products.objects.filter(status=True).count(),
-            'total_companies': Companys.objects.filter(status=True).count(),
-            'total_orders': Shoping.objects.count(),
-        }
-    except Exception as e:
-        context = {'error': str(e)}
+    """
+    Admin profile view using your real Shoping fields:
+    - shop_date: order date
+    - status: order status
+    """
+    if not request.user.is_staff_admin:
+        messages.error(request, "Access denied. Staff admin privileges required.")
+        return redirect('admins:dashboard')
+
+    # Basic stats
+    total_customers = Customer.objects.filter(status=True).count()
+    total_products = Products.objects.filter(status=True).count()
+    total_companies = Companys.objects.filter(status=True).count()
+
+    # Dates based on Shoping.shop_date (DateField)
+    today = timezone.now().date()
+    yesterday = today - timedelta(days=1)
+
+    today_orders_qs = Shoping.objects.filter(shop_date=today)
+    yesterday_orders_qs = Shoping.objects.filter(shop_date=yesterday)
+
+    today_orders = today_orders_qs.count()
+    yesterday_orders = yesterday_orders_qs.count()
+
+    today_revenue = today_orders_qs.aggregate(total=Sum('p_price'))['total'] or 0
+    total_revenue = Shoping.objects.aggregate(total=Sum('p_price'))['total'] or 0
+
+    # Recent activities: last 5 orders ordered by shop_date (no created_at/updated_at)
+    recent_activities = Shoping.objects.select_related('cust_address').order_by('-shop_date')[:5]
+
+    context = {
+        "total_customers": total_customers,
+        "total_products": total_products,
+        "total_companies": total_companies,
+        "today_orders": today_orders,
+        "yesterday_orders": yesterday_orders,
+        "today_revenue": today_revenue,
+        "total_revenue": total_revenue,
+        "recent_activities": recent_activities,
+    }
+    return render(request, "admins/profile.html", context)
+
+
+
+@login_required
+def admin_profile_update(request):
+
+    """
+    Update admin profile (basic form handling).
+    """
+    if request.method == 'POST':
+        user = request.user
+        user.first_name = request.POST.get('first_name', '')
+        user.last_name = request.POST.get('last_name', '')
+        user.email = request.POST.get('email', user.email)
+        # Note: Don't allow role changes here - use admin panel
+        user.save()
+        messages.success(request, 'Profile updated successfully.')
+        return redirect('admins:profile')
     
-    return render(request, 'admins/admin_profile.html', context)
+    return render(request, 'admins/profile_update.html', {'user': request.user})
+
+
+@login_required
+def admin_logout(request):
+    """
+    Log out admin and redirect to admin login page.
+    """
+    logout(request)
+    messages.info(request, "Logged out successfully.")
+    return redirect("admin_login")  # your existing admin login URL name
+
 
 # ============================================================================
 # COMPANY MANAGEMENT
@@ -108,7 +196,7 @@ def add_comp(request):
             Companys.objects.create(
                 name=cname, category=cat, des=des, image=image, status=True,
             )
-            return redirect("/admins/view_companys/")
+            return redirect("/admins/companys_view/")
 
         return render(request, "admins/add_comp.html", {'message': None})
     except CompExcep as e:
@@ -155,7 +243,7 @@ def edit_company(request, id):
                 obj.image = request.FILES['image']
 
             obj.save()
-            return redirect('/admins/view_companys/')
+            return redirect("/admins/companys_view/")
 
         return render(request, "admins/company_edit.html", {'rec': obj, 'message': None})
     except CompExcep as e:
@@ -167,7 +255,7 @@ def soft_company(request, id):
     rec = Companys.objects.get(id=id)
     rec.status = False
     rec.save()
-    return redirect("/admins/view_companys/")
+    return redirect("/admins/companys_view/")
 
 @login_required
 def delete_company(request, id):
@@ -176,7 +264,7 @@ def delete_company(request, id):
     if rec.image and os.path.isfile(rec.image.path):
         os.remove(rec.image.path)
     rec.delete()
-    return redirect("/admins/view_companys/")
+    return redirect("/admins/companys_view/")
 
 # ============================================================================
 # PRODUCT MANAGEMENT

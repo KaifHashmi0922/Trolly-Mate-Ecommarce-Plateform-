@@ -1022,12 +1022,14 @@ def cust_update(request):
     
     if request.method == 'POST':
         cust_id = request.session.get('cust_id')
+        print(cust_id)
         if not cust_id:
             messages.error(request, "Please login first.")
             return redirect('cust_profile')
         
         try:
             customer = Customer.objects.get(id=cust_id)
+            print(customer,"try")
             
             # PROFILE UPDATE - Check for fname (profile form)
             if request.POST.get('fname'):
@@ -1053,6 +1055,7 @@ def cust_update(request):
                 current_password = request.POST.get('current_password', '')
                 new_password = request.POST.get('new_password', '')
                 confirm_password = request.POST.get('confirm_password', '')
+                print(current_password,new_password,confirm_password)
                 
                 # Check current password
                 print("Checking password...")
