@@ -1,30 +1,36 @@
- #admins/views.py - TROLLEY MATE COMPLETE ADMIN BACKEND
-# Date: December 2025
-# Features: Analytics, Products, Companies, Customers, Stock Management, Cart
 
+# 🔐 Admin auth & roles
+from accounts.decorators import admin_login_required, role_required
+from accounts.models import AdminRole, User
+from django.contrib.auth.decorators import login_required
+
+# Django core
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Q, Sum, Count, Avg, F
-from django.utils import timezone
-from datetime import datetime, timedelta, date
 from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from django.db.models import Q, Sum, Count, Avg, F
+from datetime import datetime, timedelta, date
 
-# Trolly Mate models
-from accounts.models import User
+# 🚫 IMPORTANT
+# Do NOT use login_required in admin views
+# from django.contrib.auth.decorators import login_required    REMOVED
+
+# 🗂️ Project models
 from admins.models import Products, Companys
 from Users.models import Customer, Shoping, Address
 
-# Data analysis & visualization
+# 📊 Data analysis & visualization
 import os
 import base64
 from io import BytesIO
+
 import pandas as pd
 import numpy as np
+
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -62,122 +68,101 @@ class QueryError(Exception):
 # DASHBOARD & PROFILE
 # ============================================================================
 
-@login_required
+
+
+@admin_login_required
+@role_required(AdminRole.SUPER_ADMIN, AdminRole.ADMIN)
 def dashbord(request):
     """
-    Trolly Mate Admin Dashboard - Home page with key KPIs.
-    Protected for staff admins only. Error-safe with fallbacks.
+    Trolley Mate Admin Dashboard
     """
-    if not request.user.is_staff_admin:
-        messages.error(request, "Access denied. Staff admin privileges required.")
-        return redirect('admins:profile')
-    
     try:
-        # Trolly Mate KPIs using your exact models
-        yesterday = timezone.now().date() - timedelta(days=1)
-        
+        today = timezone.now().date()
+        yesterday = today - timedelta(days=1)
+
         context = {
-            'total_customers': Customer.objects.filter(status=True).count(),
-            'total_companies': Companys.objects.filter(status=True).count(),
-            'total_products': Products.objects.filter(status=True).count(),
-            'total_orders': Shoping.objects.count(),
-            
-            # Extra dashboard metrics
-            'today_orders': Shoping.objects.filter(created_at__date=timezone.now().date()).count(),
-            'revenue_today': Shoping.objects.filter(
-                status__in=['completed', 'delivered'],
-                created_at__date=timezone.now().date()
-            ).aggregate(total=Sum('total_amount'))['total'] or 0,
-            'low_stock': Products.objects.filter(status=True, stock__lte=10).count(),
+            "total_customers": Customer.objects.filter(status=True).count(),
+            "total_companies": Companys.objects.filter(status=True).count(),
+            "total_products": Products.objects.filter(status=True).count(),
+            "total_orders": Shoping.objects.count(),
+
+            "today_orders": Shoping.objects.filter(created_at__date=today).count(),
+            "revenue_today": Shoping.objects.filter(
+                status__in=["completed", "delivered"],
+                created_at__date=today
+            ).aggregate(total=Sum("total_amount"))["total"] or 0,
+
+            "low_stock": Products.objects.filter(
+                status=True, quantity__lte=10
+            ).count(),
         }
     except Exception as e:
-        context = {
-            'total_customers': 0, 'total_companies': 0, 'total_products': 0, 'total_orders': 0,
-            'today_orders': 0, 'revenue_today': 0, 'low_stock': 0,
-            'error': str(e),
-        }
-    
-    return render(request, 'admins/dashbord.html', context)
-@login_required
+        context = {"error": str(e)}
+
+    return render(request, "admins/dashbord.html", context)
+
+
+@admin_login_required
+@role_required(AdminRole.SUPER_ADMIN, AdminRole.ADMIN, AdminRole.STAFF)
 def admin_profile(request):
-    """
-    Admin profile view using your real Shoping fields:
-    - shop_date: order date
-    - status: order status
-    """
-    if not request.user.is_staff_admin:
-        messages.error(request, "Access denied. Staff admin privileges required.")
-        return redirect('admins:dashboard')
-
-    # Basic stats
-    total_customers = Customer.objects.filter(status=True).count()
-    total_products = Products.objects.filter(status=True).count()
-    total_companies = Companys.objects.filter(status=True).count()
-
-    # Dates based on Shoping.shop_date (DateField)
     today = timezone.now().date()
     yesterday = today - timedelta(days=1)
 
-    today_orders_qs = Shoping.objects.filter(shop_date=today)
-    yesterday_orders_qs = Shoping.objects.filter(shop_date=yesterday)
-
-    today_orders = today_orders_qs.count()
-    yesterday_orders = yesterday_orders_qs.count()
-
-    today_revenue = today_orders_qs.aggregate(total=Sum('p_price'))['total'] or 0
-    total_revenue = Shoping.objects.aggregate(total=Sum('p_price'))['total'] or 0
-
-    # Recent activities: last 5 orders ordered by shop_date (no created_at/updated_at)
-    recent_activities = Shoping.objects.select_related('cust_address').order_by('-shop_date')[:5]
-
     context = {
-        "total_customers": total_customers,
-        "total_products": total_products,
-        "total_companies": total_companies,
-        "today_orders": today_orders,
-        "yesterday_orders": yesterday_orders,
-        "today_revenue": today_revenue,
-        "total_revenue": total_revenue,
-        "recent_activities": recent_activities,
+        "total_customers": Customer.objects.filter(status=True).count(),
+        "total_products": Products.objects.filter(status=True).count(),
+        "total_companies": Companys.objects.filter(status=True).count(),
+
+        "today_orders": Shoping.objects.filter(shop_date=today).count(),
+        "yesterday_orders": Shoping.objects.filter(shop_date=yesterday).count(),
+
+        "today_revenue": Shoping.objects.filter(shop_date=today)
+            .aggregate(total=Sum("p_price"))["total"] or 0,
+
+        "total_revenue": Shoping.objects
+            .aggregate(total=Sum("p_price"))["total"] or 0,
+
+        "recent_activities": Shoping.objects
+            .select_related("cust_address")
+            .order_by("-shop_date")[:5],
     }
+
     return render(request, "admins/profile.html", context)
 
 
-
-@login_required
+@admin_login_required
+@role_required(AdminRole.SUPER_ADMIN, AdminRole.ADMIN, AdminRole.STAFF)
 def admin_profile_update(request):
-
-    """
-    Update admin profile (basic form handling).
-    """
-    if request.method == 'POST':
+    user=request.user
+    print(user.username,user.email,user.role)
+    if request.method == "POST":
         user = request.user
-        user.first_name = request.POST.get('first_name', '')
-        user.last_name = request.POST.get('last_name', '')
-        user.email = request.POST.get('email', user.email)
-        # Note: Don't allow role changes here - use admin panel
+        user.username = request.POST.get("username", user.username)
+        user.email = request.POST.get("email", user.email)
+        
+        role= request.POST.get("role")
+        user.role=role
+        print(user.role,role)
         user.save()
-        messages.success(request, 'Profile updated successfully.')
-        return redirect('admins:profile')
-    
-    return render(request, 'admins/profile_update.html', {'user': request.user})
+        print("user profile updated")
+        messages.success(request, "Profile updated successfully.")
+        return redirect("admins:admin_profile")
+
+    return render(request, "admins/profile_update.html", {"user": request.user})
 
 
-@login_required
+@admin_login_required
 def admin_logout(request):
-    """
-    Log out admin and redirect to admin login page.
-    """
     logout(request)
     messages.info(request, "Logged out successfully.")
-    return redirect("admin_login")  # your existing admin login URL name
-
+    return redirect("accounts:admin_login")
 
 # ============================================================================
 # COMPANY MANAGEMENT
 # ============================================================================
 
-@login_required
+@admin_login_required
+@role_required(AdminRole.SUPER_ADMIN, AdminRole.ADMIN)
 def add_comp(request):
     """Create a new company with validation."""
     try:
@@ -202,7 +187,8 @@ def add_comp(request):
     except CompExcep as e:
         return render(request, "admins/add_comp.html", {'message': e.message})
 
-@login_required
+@admin_login_required
+@role_required(AdminRole.SUPER_ADMIN, AdminRole.ADMIN)
 def company_view(request):
     """List all companies with stats."""
     try:
@@ -220,7 +206,8 @@ def company_view(request):
     
     return render(request, 'admins/company_view.html', context)
 
-@login_required
+@admin_login_required
+@role_required(AdminRole.SUPER_ADMIN, AdminRole.ADMIN)
 def edit_company(request, id):
     """Edit an existing company."""
     obj = Companys.objects.get(id=id)
@@ -249,7 +236,8 @@ def edit_company(request, id):
     except CompExcep as e:
         return render(request, "admins/company_edit.html", {'rec': obj, 'message': e.message})
 
-@login_required
+@admin_login_required
+@role_required(AdminRole.SUPER_ADMIN)
 def soft_company(request, id):
     """Soft delete company."""
     rec = Companys.objects.get(id=id)
@@ -257,7 +245,8 @@ def soft_company(request, id):
     rec.save()
     return redirect("/admins/companys_view/")
 
-@login_required
+@admin_login_required
+@role_required(AdminRole.SUPER_ADMIN)
 def delete_company(request, id):
     """Hard delete company."""
     rec = Companys.objects.get(id=id)
@@ -270,7 +259,8 @@ def delete_company(request, id):
 # PRODUCT MANAGEMENT
 # ============================================================================
 
-@login_required
+@admin_login_required
+@role_required(AdminRole.SUPER_ADMIN, AdminRole.ADMIN)
 def addproduct(request):
     """Create a new product."""
     try:
@@ -306,8 +296,9 @@ def addproduct(request):
     except Exception as e:
         comp = Companys.objects.all()
         return render(request, "admins/addproduct.html", {'comp': comp, 'message': str(e)})
-
-@login_required
+    
+@admin_login_required
+@role_required(AdminRole.SUPER_ADMIN, AdminRole.ADMIN, AdminRole.STAFF)
 def admin_viewproduct(request):
     """Admin product list with comprehensive stats."""
     try:
@@ -330,7 +321,8 @@ def admin_viewproduct(request):
     
     return render(request, 'admins/admin_viewproduct.html', context)
 
-@login_required
+@admin_login_required
+@role_required(AdminRole.SUPER_ADMIN, AdminRole.ADMIN)
 def edit_product(request, id):
     """Edit an existing product."""
     obj = Products.objects.get(id=id)
@@ -371,7 +363,8 @@ def edit_product(request, id):
         comp = Companys.objects.all()
         return render(request, "admins/product_edit.html", {'rec': obj, 'comp': comp, 'message': str(e)})
 
-@login_required
+@admin_login_required
+@role_required(AdminRole.SUPER_ADMIN)
 def soft_product(request, id):
     """Soft delete product."""
     rec = Products.objects.get(id=id)
@@ -379,7 +372,8 @@ def soft_product(request, id):
     rec.save()
     return redirect('/admins/admins_viewproduct/')
 
-@login_required
+@admin_login_required
+@role_required(AdminRole.SUPER_ADMIN)
 def delete_product(request, id):
     """Hard delete product."""
     rec = Products.objects.get(id=id)
@@ -392,7 +386,8 @@ def delete_product(request, id):
 # CUSTOMER MANAGEMENT
 # ============================================================================
 
-@login_required
+@admin_login_required
+@role_required(AdminRole.SUPER_ADMIN, AdminRole.ADMIN)
 def view_custmer(request):
     """List all customers with stats."""
     try:
@@ -446,18 +441,18 @@ def query(request):
         return render(request, "user/nindex.html", {'prods': all_prods, 'status': None, 'query': e.message})
 
 # ============================================================================
-# 🔥 SHOPPING CART - AUTO DECREASE PRODUCT QUANTITY
+#   SHOPPING CART - AUTO DECREASE PRODUCT QUANTITY
 # ============================================================================
 
 @login_required
 def add_to_cart(request, product_id):
-    """🔥 ADD TO CART - AUTO DECREASE PRODUCT QUANTITY"""
+    """  ADD TO CART - AUTO DECREASE PRODUCT QUANTITY"""
     try:
         product = Products.objects.get(id=product_id)
         
         if product.quantity <= 0:
             return render(request, 'error.html', {
-                'message': f"❌ {product.name} is OUT OF STOCK!",
+                'message': f"  {product.name} is OUT OF STOCK!",
                 'status': 'error'
             })
         
@@ -465,17 +460,17 @@ def add_to_cart(request, product_id):
         
         if quantity > product.quantity:
             return render(request, 'error.html', {
-                'message': f"❌ Only {product.quantity} items available!",
+                'message': f"  Only {product.quantity} items available!",
                 'status': 'error'
             })
         
         if quantity <= 0:
             return render(request, 'error.html', {
-                'message': f"❌ Invalid quantity!",
+                'message': f"  Invalid quantity!",
                 'status': 'error'
             })
         
-        # 🔥 DECREASE PRODUCT QUANTITY IN DATABASE
+        #   DECREASE PRODUCT QUANTITY IN DATABASE
         old_quantity = product.quantity
         product.quantity -= quantity
         product.save()
@@ -486,7 +481,7 @@ def add_to_cart(request, product_id):
             product.quantity = old_quantity
             product.save()
             return render(request, 'error.html', {
-                'message': "❌ Customer profile not found!",
+                'message': "  Customer profile not found!",
                 'status': 'error'
             })
         
@@ -497,18 +492,18 @@ def add_to_cart(request, product_id):
             status=False, shop_date=datetime.now(),
         )
         
-        # 🔥 GENERATE LOW STOCK WARNING ALERTS
+        #   GENERATE LOW STOCK WARNING ALERTS
         low_stock_warning = ""
         warning_type = "success"
         
         if product.quantity == 0:
-            low_stock_warning = f"🚨 CRITICAL ALERT: {product.name} is NOW OUT OF STOCK!"
+            low_stock_warning = f" CRITICAL ALERT: {product.name} is NOW OUT OF STOCK!"
             warning_type = "danger"
         elif product.quantity < 5:
-            low_stock_warning = f"🔴 CRITICAL: Only {product.quantity} items left!"
+            low_stock_warning = f" CRITICAL: Only {product.quantity} items left!"
             warning_type = "danger"
         elif product.quantity < 10:
-            low_stock_warning = f"🟠 WARNING: Only {product.quantity} items left!"
+            low_stock_warning = f" WARNING: Only {product.quantity} items left!"
             warning_type = "warning"
         
         return render(request, 'user/cart_success.html', {
@@ -522,23 +517,23 @@ def add_to_cart(request, product_id):
         
     except Products.DoesNotExist:
         return render(request, 'error.html', {
-            'message': "❌ Product not found!",
+            'message': "  Product not found!",
             'status': 'error'
         })
     except ValueError:
         return render(request, 'error.html', {
-            'message': "❌ Invalid quantity format!",
+            'message': "  Invalid quantity format!",
             'status': 'error'
         })
     except Exception as e:
         return render(request, 'error.html', {
-            'message': f"❌ Error: {str(e)}",
+            'message': f"  Error: {str(e)}",
             'status': 'error'
         })
 
 @login_required
 def checkout(request):
-    """🔥 CHECKOUT - AUTO UPDATE ORDER STATUS & SHOW STOCK STATUS"""
+    """  CHECKOUT - AUTO UPDATE ORDER STATUS & SHOW STOCK STATUS"""
     try:
         customer = Customer.objects.get(user=request.user)
         
@@ -579,7 +574,7 @@ def checkout(request):
                 stock_color = "danger"
                 low_stock_alerts.append({
                     'product': product.name,
-                    'message': f"⚠️ {product.name} is now out of stock!",
+                    'message': f" {product.name} is now out of stock!",
                     'type': 'danger'
                 })
             elif product.quantity < 5:
@@ -587,7 +582,7 @@ def checkout(request):
                 stock_color = "danger"
                 low_stock_alerts.append({
                     'product': product.name,
-                    'message': f"🔴 Only {product.quantity} items left!",
+                    'message': f" Only {product.quantity} items left!",
                     'type': 'danger'
                 })
             elif product.quantity < 10:
@@ -595,7 +590,7 @@ def checkout(request):
                 stock_color = "warning"
                 low_stock_alerts.append({
                     'product': product.name,
-                    'message': f"🟠 Only {product.quantity} items left!",
+                    'message': f" Only {product.quantity} items left!",
                     'type': 'warning'
                 })
             
@@ -616,18 +611,19 @@ def checkout(request):
         
     except Customer.DoesNotExist:
         return render(request, 'error.html', {
-            'message': "❌ Customer profile not found!",
+            'message': "  Customer profile not found!",
             'status': 'error'
         })
     except Exception as e:
         return render(request, 'error.html', {
-            'message': f"❌ Error: {str(e)}",
+            'message': f"  Error: {str(e)}",
             'status': 'error'
         })
 
-@login_required
+@admin_login_required
+@role_required(AdminRole.SUPER_ADMIN, AdminRole.ADMIN)
 def get_low_stock_products(request):
-    """🔥 GET ALL LOW STOCK PRODUCTS (< 10) - ADMIN DASHBOARD"""
+    """  GET ALL LOW STOCK PRODUCTS (< 10) - ADMIN DASHBOARD"""
     try:
         low_stock_prods = Products.objects.filter(
             quantity__lte=10, status=True
@@ -650,14 +646,14 @@ def get_low_stock_products(request):
     return render(request, 'admins/low_stock_alert.html', context)
 
 # ============================================================================
-# 🔥 ANALYTICS & CHARTS (MAIN FEATURE)
+#  ANALYTICS & CHARTS (MAIN FEATURE)
 # ============================================================================
-
-@login_required
+@admin_login_required
+@role_required(AdminRole.SUPER_ADMIN)
 def admin_analytics(request):
-    """🔥 MAIN ANALYTICS DASHBOARD - 95+ METRICS + 7 CHARTS"""
+    """ MAIN ANALYTICS DASHBOARD - 95+ METRICS + 7 CHARTS"""
     try:
-        # 🔥 1. FETCH ALL DATA INTO DATAFRAMES
+        #  1. FETCH ALL DATA INTO DATAFRAMES
         products_df = pd.DataFrame(list(Products.objects.values(
             'id', 'name', 'price', 'quantity', 'status',
             'company__name', 'company__category', 'des'
@@ -675,7 +671,7 @@ def admin_analytics(request):
             'id', 'p_name', 'p_quantity', 'p_price', 'status', 'shop_date'
         )))
 
-        # 🔥 2. CALCULATE ALL STATS
+        #  2. CALCULATE ALL STATS
         total_revenue = products_df['price'].sum() if not products_df.empty else 0
         total_revenue_value = (products_df['price'] * products_df['quantity']).sum() if not products_df.empty else 0
         total_products = len(products_df)
@@ -698,10 +694,10 @@ def admin_analytics(request):
         companies_by_category = dict(companies_df['category'].value_counts()) if not companies_df.empty else {}
         products_by_category = dict(products_df['company__category'].value_counts()) if not products_df.empty else {}
         
-        # 🔥 3. GENERATE CHARTS
+        #   3. GENERATE CHARTS
         charts = generate_analytics_charts(products_df, companies_df, orders_df)
 
-        # 🔥 4. COMPILE CONTEXT (95+ variables)
+        #   4. COMPILE CONTEXT (95+ variables)
         context = {
             'total_revenue': round(total_revenue, 2),
             'total_revenue_value': round(total_revenue_value, 2),
@@ -753,7 +749,7 @@ def admin_analytics(request):
 
 @login_required
 def generate_analytics_charts(products_df, companies_df, orders_df):
-    """🔥 CHART GENERATION - 7 PROFESSIONAL CHARTS"""
+    """  CHART GENERATION - 7 PROFESSIONAL CHARTS"""
     charts = {
         'revenue_chart': '',
         'stock_chart': '',

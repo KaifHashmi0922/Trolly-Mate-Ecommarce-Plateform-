@@ -141,7 +141,7 @@ class Products(models.Model):
     
     created_at = models.DateTimeField(
         auto_now_add=True,
-        help_text=_("Product creation timestamp."),
+        help_text=_("Product creation timestamp.")
     )
     
     updated_at = models.DateTimeField(

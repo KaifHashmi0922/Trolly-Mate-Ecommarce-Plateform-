@@ -128,7 +128,7 @@
     <div class="container-fluid position-fixed top-0 z-3">
         <nav class="navbar navbar-expand-lg navbar-dark bg-transparent">
             <div class="container">
-                <a href="{% url 'index' %}" class="navbar-brand fw-bold fs-4">
+                <a href="{% url 'users:index' %}" class="navbar-brand fw-bold fs-4">
                     <i>Trolly Mate</i>
                 </a>
             </div>
@@ -172,7 +172,7 @@
 
                     <!-- Form Content -->
                     <form method="post" 
-                          action="{% url 'forget_pass_phone' %}" 
+                          action="{% url 'users:forget_pass_phone' %}" 
                           class="needs-validation" 
                           novalidate>
                         {% csrf_token %}
@@ -230,7 +230,7 @@
                         <!-- Email fallback (only send screen) -->
                         {% if not status %}
                         <div class="text-center mb-4">
-                            <a href="{% url 'forget_pass_email' %}" class="text-muted text-decoration-none fw-medium">
+                            <a href="{% url 'users:forget_pass_email' %}" class="text-muted text-decoration-none fw-medium">
                                 <i class="bi bi-envelope me-2"></i>Use email instead
                             </a>
                         </div>
@@ -249,7 +249,7 @@
 
                     <!-- Back to Login -->
                     <div class="text-center">
-                        <a href="{% url 'login' %}" class="text-muted text-decoration-none fw-medium">
+                        <a href="{% url 'users:login' %}" class="text-muted text-decoration-none fw-medium">
                             <i class="bi bi-arrow-left me-2"></i>← Back to Login
                         </a>
                     </div>

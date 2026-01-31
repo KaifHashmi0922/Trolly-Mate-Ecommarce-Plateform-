@@ -1,30 +1,21 @@
 from django.shortcuts import render,redirect
-from django.http import HttpResponse,HttpResponseRedirect
+from django.http import HttpResponse
 from .models import Customer,Address,Shoping
-from admins.models import Products,Companys
-import datetime as dt
+from admins.models import Products
 from .otp import*
-import math
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password,check_password
 import os
 from django.db.models import Q
-from django.shortcuts import redirect, render
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
-
-from django.contrib.auth.hashers import make_password
-
+from datetime import date
 from django.core.cache import cache
 
 
 
-from django.utils import timezone
 
 
-from django.contrib.auth import update_session_auth_hash
 
 
 
@@ -119,11 +110,11 @@ def signup_view(request):
                         request.session['cust_email']=email
                         print(cobj.pass1)
                         request.session['cust_password']=pass1
-                        return redirect('/login/')
+                        return redirect('users:login')
         except Data_Insert as e:
             return render(request,"user/signup.html",{'msg':e})
-        # except Exception as e:
-        #     return render(request,"user/signup.html",{'msg':e})
+        except Exception as e:
+            return render(request,"user/signup.html",{'msg':e})
     return render(request,"user/signup.html",{'msg':None})
 
 
@@ -148,8 +139,8 @@ def login(request):
             else:
                 request.session['cust_image']=""
             cust.save()
-            print(request.session.get('cust_email'),request.session.get('cust_password'))
-            return redirect('/')
+            print(request.session.get('cust_email'),request.session.get('cust_password'),"=============")
+            return redirect('users:index')
         else:
             if request.method=="POST":
                 uname=request.POST.get('username')
@@ -169,7 +160,7 @@ def login(request):
                                 request.session['cust_image']=""
                             cust.save()
                             print(request.session.get('cust_email'),request.session.get('cust_id'))
-                            return redirect('/')
+                            return redirect('users:index')
                     else:
                         raise Data_Insert("Customer Not Exist !!!")
                 else:
@@ -182,20 +173,19 @@ def login(request):
         return render(request,"user/cust_login.html",{'msg':e})
      
 
-
+@login_required(login_url='/login/')
 def cust_soft(request):
     cust_id=request.session.get('cust_id')
     obj=Customer.objects.get(id=cust_id)
     obj.status=False
-    print(obj.status)
     obj.save()
     return HttpResponse(cust_id)
    
 
-
-def logout_view(request):
+def cust_logout(request):
     request.session.clear()
-    return redirect('/')
+    return redirect('users:index')
+
 
 
 def profile_view(request):
@@ -203,11 +193,11 @@ def profile_view(request):
         cust_id = request.session.get('cust_id')
         if not cust_id:
             messages.error(request, "Please login first.")
-            return redirect('login')
+            return redirect('users:login')
         
         obj = Customer.objects.get(id=cust_id)
         
-        # 🔥 Fetch YOUR Shoping orders
+        #  Fetch YOUR Shoping orders
         orders = Shoping.objects.filter(cust_address__cid_id=cust_id).order_by('-shop_date')
         
         context = {
@@ -226,8 +216,7 @@ def profile_view(request):
     except Exception as e:
         print(f"Profile error: {e}")
         messages.error(request, "Something went wrong.")
-        return redirect('login')
-
+        return redirect('users:login')
 
 
 def cart_view(request):
@@ -282,9 +271,9 @@ def cart_update(request):
     print(cart)
     messages.success(request, "Cart updated")
     
-    # ✅ SMART REDIRECT: Detects EXACT page context
+    #  SMART REDIRECT: Detects EXACT page context
     if request.POST.get('c_plus') or request.POST.get('c_minus'): # Cart + button
-        return redirect('/cart/')
+        return redirect('users:cart')
     else:
         return redirect('/')  # plus on index
 
@@ -298,7 +287,7 @@ def cart_delete(request):
         if pid in cart:
             cart.pop(pid)
             request.session["cart"] = cart
-    return redirect("cart")  # your cart page name
+    return redirect("users:cart")  # your cart page name
 
 
 
@@ -311,7 +300,7 @@ def change_password(request):
             user=Customer.objects.get(email=email)
             user.pass1=make_password(password1)
             user.save()
-            return redirect('/login/')
+            return redirect('users:login')
         else:
             return render(request,"user/change_password.html",{'message':"Both Password Not Matched"})
     return render(request,"user/change_password.html")
@@ -319,7 +308,7 @@ def change_password(request):
 
  
    
-# @login_required(login_url='/login/')
+
 
 def place_order(request):
     c_id = request.session.get('cust_id')
@@ -327,7 +316,7 @@ def place_order(request):
     c_email = request.session.get('cust_email')
 
     if not (c_id and c_email):
-        return redirect('/login/')
+        return redirect('users:login')
 
     cart_ids = request.session.get('cart', {}).keys()
     prods = Products.objects.filter(id__in=cart_ids)
@@ -338,7 +327,7 @@ def place_order(request):
     else:
         address = Address.objects.filter(cid=c_id).first()
 
-    # ✅ COMPLETE ORDER PROCESSING
+    #  COMPLETE ORDER PROCESSING
     if request.method == 'POST' and prods.exists() and address:
         cart = request.session.get('cart', {})
         order_count = 0
@@ -347,22 +336,22 @@ def place_order(request):
             product = Products.objects.get(id=prod_id)
             quantity = cart_item.get('quantity', 1)
             
-            # ✅ 1. STOCK CHECK (your field: quantity)
+            #  1. STOCK CHECK (your field: quantity)
             if product.quantity < quantity:
-                messages.error(request, f"❌ Insufficient stock for {product.name}")
+                messages.error(request, f" Insufficient stock for {product.name}")
                 return render(request, "user/placeorder.html", context)
             
-            # ✅ 2. MINUS STOCK (quantity field)
+            # 2. MINUS STOCK (quantity field)
             product.quantity -= quantity
             product.save()
             
-            # ✅ 3. CREATE Shoping record (EXACT field mapping)
+            #  3. CREATE Shoping record (EXACT field mapping)
             shop_order = Shoping(
                 p_id=str(product.id),
-                p_name=product.name,           # ✅ Your field
+                p_name=product.name,           #  Your field
                 p_quantity=quantity,
-                p_price=int(product.price),    # ✅ Your field (convert to int)
-                p_image=product.image,         # ✅ Your field
+                p_price=int(product.price),    #  Your field (convert to int)
+                p_image=product.image,         # Your field
                 p_date=str(date.today()),
                 cust_address=address,
                 shop_date=timezone.now(),
@@ -371,18 +360,18 @@ def place_order(request):
             shop_order.save()
             order_count += 1
         
-        # ✅ 4. Clear cart & Success
+        #  4. Clear cart & Success
         request.session['cart'] = {}
         request.session.modified = True
         
-        messages.success(request, f"✅ Order placed! {order_count} items added to history.")
-        return redirect('payment_gateway')
+        messages.success(request, f" Order placed! {order_count} items added to history.")
+        return redirect('users:payment_gateway')
 
     context = {
-        'prods': prods,                    # ✅ Products list
-        'address': address,               # ✅ Address object
-        'total_amount': "1001",     # ✅ Calculate: sum(p.price for p in prods)
-        'order_id': '12345',             # ✅ Optional
+        'prods': prods,                    #  Products list
+        'address': address,               #  Address object
+        'total_amount': "1001",     #  Calculate: sum(p.price for p in prods)
+        'order_id': '12345',             #  Optional
     }
     return render(request, 'user/placeorder.html', context)
 
@@ -419,7 +408,7 @@ def forget_password_phone(request):
                                     request.session['old_time']=str(old_time)
                                     counter=0
                                     print(counter,"counter")
-                                    return redirect('/phone_varify')
+                                    return redirect('users:phone_varify')
                                 else:
                                     counter+=1
                                     print(counter,"counter")
@@ -461,9 +450,9 @@ def phone_otp_varify(request):
                 if result:
                    obj=Customer.objects.get(phone=phone)
                    request.session['email']=obj.email
-                   return redirect('/change_password/')
+                   return redirect('users:change_password')
                 else:      
-                    return redirect('/forget_pass_phone/')        
+                    return redirect('users:forget_pass_phone')        
             else:
                 raise OTP("OTP IS Must For Varification")
                
@@ -529,7 +518,7 @@ def change_password(request):
     email = request.session.get('email')
     if not email:
         messages.error(request, 'Verification expired. Please start again.')
-        return redirect('forget_pass_email')
+        return redirect('users:forget_pass_email')
     
     context['email'] = email
     
@@ -561,7 +550,7 @@ def change_password(request):
             cache.delete(f'otp_data_{email}')  # Remove OTP cache
             
             messages.success(request, 'Password changed successfully!')
-            return redirect('login')  # Go to login page
+            return redirect('users:login')  # Go to login page
             
         except Customer.DoesNotExist:
             context['message'] = 'User not found'
@@ -598,7 +587,7 @@ def change_password(request):
 #                                         otp_data=(otp,old_time,obj.email)
 #                                         counter=0
 #                                         print(counter,"counter")
-#                                         return redirect('/email_varify/')
+#                                         return redirect('users:email_varify')
 #                                     else:
 #                                         counter+=1
 #                                         print(counter,"counter")
@@ -640,7 +629,7 @@ def change_password(request):
 #             if result:
 #                 obj=Customer.objects.get(email=email)
 #                 request.session['email']=obj.email
-#                 return redirect('/change_password/')
+#                 return redirect('users:change_password')
 #             else:
 #                 raise OTP("OTP IS Must For Varification")
 #         except OTP as e:
@@ -679,12 +668,11 @@ def payment_gateway(request):
     }
     return render(request, "user/payment.html", context)
 
-
 def payment(request):
     cart = request.session.get('cart', {})
     product_ids = list(cart.keys())
     if not product_ids:
-        return redirect('/cart/')
+        return redirect('users:cart')
 
     products = Products.objects.filter(id__in=product_ids)
     
@@ -754,12 +742,12 @@ def buynow(request):
         print(prod)
         
         if prod:
-            return redirect('/cart/')
+            return redirect('users:cart')
         else:
             cart[p_id]=1
             request.session['cart']=cart
             print(cart)
-            return redirect('/cart/')    
+            return redirect('users:cart')    
     request.session['cart']=cart
     return redirect('/')
 
@@ -771,37 +759,7 @@ def buynow(request):
 
 
 
-@csrf_exempt
-def payment_callback(request):
-    if request.method != "POST":
-        return redirect("/")
-
-
-    rzp_order_id = request.POST.get("razorpay_order_id", "")
-    rzp_payment_id = request.POST.get("razorpay_payment_id", "")
-    rzp_signature = request.POST.get("razorpay_signature", "")
-
-
-    params_dict = {
-        "razorpay_order_id": rzp_order_id,
-        "razorpay_payment_id": rzp_payment_id,
-        "razorpay_signature": rzp_signature,
-    }
-
-
-    try:
-        razorpay_client.utility.verify_payment_signature(params_dict)
-        # mark success -> store some info in session for invoice
-        request.session["payment_success"] = True
-        request.session["payment_method"] = "Online"
-        request.session["razorpay_payment_id"] = rzp_payment_id
-        return redirect("payment")   # go to invoice view
-    except:
-        request.session["payment_success"] = False
-        return render(request, "user/payment_failed.html")
-
-
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -864,17 +822,17 @@ def query(request):
 
 
 
-
+@login_required(login_url='/login/')
 def cust_edit(request):
     cid = request.session.get('cust_id')
     if not cid:
-        return redirect('/login/')
+        return redirect('users:login')
 
 
     try:
         obj = Customer.objects.get(id=cid)
     except Customer.DoesNotExist:
-        return redirect('/login/')
+        return redirect('users:login')
 
 
     if request.method == "POST":
@@ -902,13 +860,13 @@ def cust_edit(request):
 def show_address(request):
     c_id = request.session.get('cust_id')
     if not c_id:
-        return redirect('/login/')
+        return redirect('users:login')
 
 
     try:
         cust = Customer.objects.get(id=c_id)
     except Customer.DoesNotExist:
-        return redirect('/login/')
+        return redirect('users:login')
 
 
     addresses = Address.objects.filter(cid=cust)
@@ -920,7 +878,7 @@ def show_address(request):
         if addr_id:
             request.session["selected_address_id"] = int(addr_id)
             request.session.modified = True
-            return redirect('/place_order/')   # go back to order summary
+            return redirect('users:place_order')   # go back to order summary
 
 
     selected_id = request.session.get("selected_address_id")
@@ -941,7 +899,7 @@ def add_address(request):
 
     # Login check
     if not cid or not email:
-        return redirect('/login/')
+        return redirect('users:login')
 
 
     if request.method == "POST":
@@ -963,7 +921,7 @@ def add_address(request):
         )
 
 
-        return redirect('/place_order/')
+        return redirect('users:place_order')
 
 
     return render(request, "user/address_form.html")
@@ -973,7 +931,7 @@ def add_address(request):
 def edit_address(request, id):
     cid = request.session.get('cust_id')
     if not cid:
-        return redirect('/login/')
+        return redirect('users:login')
 
 
     address = Address.objects.get(id=id, cid_id=cid)
@@ -992,7 +950,7 @@ def edit_address(request, id):
         address.save()
 
 
-        return redirect('/show_address/')
+        return redirect('users:show_address')
 
 
     return render(request, "user/edit_address.html", {'address': address})
@@ -1002,21 +960,21 @@ def edit_address(request, id):
 def delete_address(request, id):
     cid = request.session.get('cust_id')
     if not cid:
-        return redirect('/login/')
+        return redirect('users:login')
 
 
     address = Address.objects.get(id=id, cid_id=cid)
     address.delete()
 
 
-    return redirect('/show_address/')
+    return redirect('users:show_address')
 
 
 
 
 
 
-
+@login_required(login_url='/login/')
 def cust_update(request):
     print("POST DATA:", dict(request.POST))  # ✅ DEBUG
     
@@ -1025,7 +983,7 @@ def cust_update(request):
         print(cust_id)
         if not cust_id:
             messages.error(request, "Please login first.")
-            return redirect('cust_profile')
+            return redirect('users:cust_profile')
         
         try:
             customer = Customer.objects.get(id=cust_id)
@@ -1044,7 +1002,7 @@ def cust_update(request):
                 
                 customer.save()
                 messages.success(request, "Profile updated successfully!")
-                return redirect('cust_profile')
+                return redirect('users:cust_profile')
             
             # PASSWORD UPDATE - Check for new_password (password form)
             elif request.POST.get('new_password'):
@@ -1069,13 +1027,13 @@ def cust_update(request):
                 if new_password != confirm_password:
                     print("❌ Passwords don't match")
                     messages.error(request, "New passwords don't match!")
-                    return redirect('cust_profile')
+                    return redirect('users:cust_profile')
                 
                 # Length check
                 if len(new_password) < 6:
                     print("❌ Password too short")
                     messages.error(request, "Password must be at least 6 characters!")
-                    return redirect('cust_profile')
+                    return redirect('users:cust_profile')
                 
                 # UPDATE!
                 print("✅ UPDATING PASSWORD")
@@ -1084,15 +1042,15 @@ def cust_update(request):
                 print("✅ SAVED!")
                 
                 messages.success(request, "✅ Password changed successfully!")
-                return redirect('cust_profile')
+                return redirect('users:cust_profile')
             
             else:
                 print("❌ NO FORM DATA")
                 messages.error(request, "Invalid form data!")
-                return redirect('cust_profile')
+                return redirect('users:cust_profile')
                 
         except Customer.DoesNotExist:
             messages.error(request, "Customer not found!")
-            return redirect('login')
+            return redirect('users:login')
     
-    return redirect('cust_profile')
+    return redirect('users:cust_profile')

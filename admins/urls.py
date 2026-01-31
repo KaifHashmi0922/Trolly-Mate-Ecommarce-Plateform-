@@ -7,6 +7,7 @@ urlpatterns = [
     # Dashboard & Profile
     path('', views.dashbord, name='dashbord'),
     path('admin_profile/', views.admin_profile, name='admin_profile'),
+    
     path('profile/update/', views.admin_profile_update, name='admin_profile_update'),
     path("admin_logout/", views.admin_logout, name="admin_logout"),
     # Company Management

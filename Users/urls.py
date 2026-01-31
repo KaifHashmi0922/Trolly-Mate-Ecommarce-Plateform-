@@ -4,13 +4,15 @@ from django.conf.urls.static import static
 from django.conf import settings
 from . import views
 
+app_name = 'users'
+
 urlpatterns = [
 
     # Home & Auth
     path('', views.index, name='index'),
     path('signup/', views.signup_view, name='signup'),
     path('login/', views.login, name='login'),
-    path('logout/', views.logout_view, name='logout'),
+    path('logout/', views.cust_logout, name='logout'),
     path('guest/', views.login, name='guest'),
 
     # Profile

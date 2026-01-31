@@ -121,7 +121,7 @@ def generate_invoice_pdf(request, email, product_ids):
         {
             'email': email,
             'prods': products,
-            'request': request,  # ✅ this line fixes the error
+            'request': request,  #  this line fixes the error
         }
     )
     

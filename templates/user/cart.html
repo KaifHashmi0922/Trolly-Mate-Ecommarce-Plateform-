@@ -370,7 +370,7 @@
                 <h3 class="mb-4">Your cart is empty</h3>
                 <p class="text-muted mb-5">Looks like you haven't added anything to your cart yet.</p>
                 
-                <a href="{% url 'index' %}">
+                <a href="{% url 'users:index' %}">
                     <button class="continue-btn">
                         <i class="bi bi-arrow-left me-2"></i>Continue Shopping
                     </button>
@@ -401,7 +401,7 @@
                                 <td><strong>{{ p.price|Currency }}</strong></td>
                                 <td>
                                     <div class="quantity-controls">
-                                        <form action="{% url 'cart_update' %}" method="POST" style="display: inline;">
+                                        <form action="{% url 'users:cart_update' %}" method="POST" style="display: inline;">
                                             {% csrf_token %}
                                             <input type="hidden" name="c_minus" value="{{ p.id }}">
                                             <button type="submit" class="qty-btn qty-minus" title="Decrease">
@@ -412,7 +412,7 @@
                                         <input type="text" class="qty-input" 
                                                value="{{ p|quantity:request.session.cart }}" readonly>
                                         
-                                        <form action="{% url 'cart_update' %}" method="POST" style="display: inline;">
+                                        <form action="{% url 'users:cart_update' %}" method="POST" style="display: inline;">
                                             {% csrf_token %}
                                             <input type="hidden" name="c_plus" value="{{ p.id }}">
                                             <button type="submit" class="qty-btn qty-plus" title="Increase">

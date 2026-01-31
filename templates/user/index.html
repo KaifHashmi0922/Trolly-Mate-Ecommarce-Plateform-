@@ -801,14 +801,14 @@
         <header id="header" class="header fixed-top d-flex align-items-center">
             <div class="container-fluid d-flex justify-content-between align-items-center">
                 <!-- Logo -->
-                <a href="{% url 'index' %}" class="logo d-flex align-items-center">
+                <a href="{% url 'users:index' %}" class="logo d-flex align-items-center">
                     <img src="{% static 'assets/img/apple-touch-icon-2.png' %}" alt="Trolly Mate">
                     <span>Trolly Mate</span>
                 </a>
 
                 <!-- Search Bar -->
                 <div class="search-bar">
-                    <form class="search-form" method="GET" action="{% url 'query' %}">
+                    <form class="search-form" method="GET" action="{% url 'users:query' %}">
                         <input type="text" name="query" placeholder="{% if query %}{{ query }}{% else %}Search products...{% endif %}" title="Enter search keyword">
                         <button type="submit" title="Search"><i class="bi bi-search"></i></button>
                     </form>
@@ -817,7 +817,7 @@
                 <!-- Navigation -->
                 <nav class="header-nav">
                     <ul class="d-flex align-items-center gap-3">
-                        <li><a href="{% url 'cust_profile' %}" class="nav-link" title="Profile">
+                        <li><a href="{% url 'users:cust_profile' %}" class="nav-link" title="Profile">
                             {% if request.session.cust_image %}  
                                 <img src="{% static request.session.cust_image %}" alt="Profile">
                             {% else %}
@@ -825,7 +825,7 @@
                             {% endif %}
                         </a></li>
                         <li>
-                            <a href="{% url 'cart' %}" class="nav-link cart-link" title="Shopping Cart">
+                            <a href="{% url 'users:cart' %}" class="nav-link cart-link" title="Shopping Cart">
                                 <img src="{% static 'assets/img/cartb.png' %}" alt="Cart">
                                 {% if request.session.cart %}
                                     <span class="cart-badge">{{ request.session.cart|length }}</span>
@@ -833,7 +833,7 @@
                             </a>
                         </li>
 
-                        <li><a href="{% url 'logout' %}" class="nav-link" title="Logout">
+                        <li><a href="{% url 'users:logout' %}" class="nav-link" title="Logout">
                             <img src="{% static 'assets/img/logout.png' %}" alt="Logout">
                         </a></li>
                     </ul>
@@ -864,30 +864,30 @@
                                 <div class="product-actions">
                                     {% if p.quantity|get_item:request.session.cart %}
                                     <div class="quantity-controls">
-                                        <form action="{% url 'cart_update' %}" method="POST" style="width: 40px;">
+                                        <form action="{% url 'users:cart_update' %}" method="POST" style="width: 40px;">
                                             {% csrf_token %}
                                             <input type="hidden" name="minus" value="{{ p.id }}">
                                             <button type="submit" class="qty-btn qty-minus" title="Decrease Quantity"><i class="bi bi-dash"></i></button>
                                         </form>
                                         <div class="qty-display">{{ p|quantity:request.session.cart }}</div>
-                                        <form action="{% url 'cart_update' %}" method="POST" style="width: 40px;">
+                                        <form action="{% url 'users:cart_update' %}" method="POST" style="width: 40px;">
                                             {% csrf_token %}
                                             <input type="hidden" name="plus" value="{{ p.id }}">
                                             <button type="submit" class="qty-btn qty-plus" title="Increase Quantity"><i class="bi bi-plus"></i></button>
                                         </form>
                                     </div>
-                                    <form action="{% url 'bynow' %}" method="post">
+                                    <form action="{% url 'users:bynow' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="bynow" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
                                     </form>
                                     {% else %}
-                                    <form action="{% url 'cart_update' %}" method="post">
+                                    <form action="{% url 'users:cart_update' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="plus" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-add-cart"><i class="bi bi-cart-plus"></i>Add to Cart</button>
                                     </form>
-                                    <form action="{% url 'bynow' %}" method="post">
+                                    <form action="{% url 'users:bynow' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="bynow" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
@@ -920,30 +920,30 @@
                                 <div class="product-actions">
                                     {% if p.quantity|get_item:request.session.cart %}
                                     <div class="quantity-controls">
-                                        <form action="{% url 'cart_update' %}" method="POST" style="width: 40px;">
+                                        <form action="{% url 'users:cart_update' %}" method="POST" style="width: 40px;">
                                             {% csrf_token %}
                                             <input type="hidden" name="minus" value="{{ p.id }}">
                                             <button type="submit" class="qty-btn qty-minus" title="Decrease Quantity"><i class="bi bi-dash"></i></button>
                                         </form>
                                         <div class="qty-display">{{ p|quantity:request.session.cart }}</div>
-                                        <form action="{% url 'cart_update' %}" method="POST" style="width: 40px;">
+                                        <form action="{% url 'users:cart_update' %}" method="POST" style="width: 40px;">
                                             {% csrf_token %}
                                             <input type="hidden" name="plus" value="{{ p.id }}">
                                             <button type="submit" class="qty-btn qty-plus" title="Increase Quantity"><i class="bi bi-plus"></i></button>
                                         </form>
                                     </div>
-                                    <form action="{% url 'bynow' %}" method="post">
+                                    <form action="{% url 'users:bynow' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="bynow" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
                                     </form>
                                     {% else %}
-                                    <form action="{% url 'cart_update' %}" method="post">
+                                    <form action="{% url 'users:cart_update' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="plus" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-add-cart"><i class="bi bi-cart-plus"></i>Add to Cart</button>
                                     </form>
-                                    <form action="{% url 'bynow' %}" method="post">
+                                    <form action="{% url 'users:bynow' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="bynow" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
@@ -976,12 +976,12 @@
 
                                 <!-- Product Actions -->
                                 <div class="product-actions">
-                                    <form action="{% url 'cart_update' %}" method="post">
+                                    <form action="{% url 'users:cart_update' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="plus" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-add-cart"><i class="bi bi-cart-plus"></i>Add to Cart</button>
                                     </form>
-                                    <form action="{% url 'bynow' %}" method="post">
+                                    <form action="{% url 'users:bynow' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="bynow" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
@@ -1011,12 +1011,12 @@
 
                                 <!-- Product Actions -->
                                 <div class="product-actions">
-                                    <form action="{% url 'cart_update' %}" method="post">
+                                    <form action="{% url 'users:cart_update' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="plus" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-add-cart"><i class="bi bi-cart-plus"></i>Add to Cart</button>
                                     </form>
-                                    <form action="{% url 'bynow' %}" method="post">
+                                    <form action="{% url 'users:bynow' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="bynow" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
@@ -1035,14 +1035,14 @@
         <header id="header" class="header fixed-top d-flex align-items-center">
             <div class="container-fluid d-flex justify-content-between align-items-center">
                 <!-- Logo -->
-                <a href="{% url 'index' %}" class="logo d-flex align-items-center">
+                <a href="{% url 'users:index' %}" class="logo d-flex align-items-center">
                     <img src="{% static 'assets/img/apple-touch-icon-2.png' %}" alt="Trolly Mate">
                     <span>Trolly Mate</span>
                 </a>
 
                 <!-- Search Bar -->
                 <div class="search-bar">
-                    <form class="search-form" method="GET" action="{% url 'query' %}">
+                    <form class="search-form" method="GET" action="{% url 'users:query' %}">
                         <input type="text" name="query" placeholder="{% if query %}{{ query }}{% else %}Search products...{% endif %}" title="Enter search keyword">
                         <button type="submit" title="Search"><i class="bi bi-search"></i></button>
                     </form>
@@ -1051,11 +1051,11 @@
                 <!-- Navigation -->
                 <nav class="header-nav">
                     <ul class="d-flex align-items-center gap-3">
-                        <li><a href="{% url 'login' %}" class="nav-link" title="Login">
+                        <li><a href="{% url 'users:login' %}" class="nav-link" title="Login">
                             <img src="{% static 'assets/img/guest.png' %}" alt="Guest">
                         </a></li>
                     <li>
-                    <a href="{% url 'cart' %}" class="nav-link cart-link" title="Shopping Cart">
+                    <a href="{% url 'users:cart' %}" class="nav-link cart-link" title="Shopping Cart">
                         <img src="{% static 'assets/img/cartb.png' %}" alt="Cart">
                         {% if request.session.cart %}
                             <span class="cart-badge">{{ request.session.cart|length }}</span>
@@ -1091,30 +1091,30 @@
                                 <div class="product-actions">
                                     {% if p.quantity|get_item:request.session.cart %}
                                     <div class="quantity-controls">
-                                        <form action="{% url 'cart_update' %}" method="POST" style="width: 40px;">
+                                        <form action="{% url 'userscart_update' %}" method="POST" style="width: 40px;">
                                             {% csrf_token %}
                                             <input type="hidden" name="minus" value="{{ p.id }}">
                                             <button type="submit" class="qty-btn qty-minus" title="Decrease Quantity"><i class="bi bi-dash"></i></button>
                                         </form>
                                         <div class="qty-display">{{ p|quantity:request.session.cart }}</div>
-                                        <form action="{% url 'cart_update' %}" method="POST" style="width: 40px;">
+                                        <form action="{% url 'users:cart_update' %}" method="POST" style="width: 40px;">
                                             {% csrf_token %}
                                             <input type="hidden" name="plus" value="{{ p.id }}">
                                             <button type="submit" class="qty-btn qty-plus" title="Increase Quantity"><i class="bi bi-plus"></i></button>
                                         </form>
                                     </div>
-                                    <form action="{% url 'bynow' %}" method="post">
+                                    <form action="{% url 'users:bynow' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="bynow" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
                                     </form>
                                     {% else %}
-                                    <form action="{% url 'cart_update' %}" method="post">
+                                    <form action="{% url 'userscart_update' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="plus" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-add-cart"><i class="bi bi-cart-plus"></i>Add to Cart</button>
                                     </form>
-                                    <form action="{% url 'bynow' %}" method="post">
+                                    <form action="{% url 'usersbynow' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="bynow" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
@@ -1147,30 +1147,30 @@
                                 <div class="product-actions">
                                     {% if p.quantity|get_item:request.session.cart %}
                                     <div class="quantity-controls">
-                                        <form action="{% url 'cart_update' %}" method="POST" style="width: 40px;">
+                                        <form action="{% url 'users:cart_update' %}" method="POST" style="width: 40px;">
                                             {% csrf_token %}
                                             <input type="hidden" name="minus" value="{{ p.id }}">
                                             <button type="submit" class="qty-btn qty-minus" title="Decrease Quantity"><i class="bi bi-dash"></i></button>
                                         </form>
                                         <div class="qty-display">{{ p|quantity:request.session.cart }}</div>
-                                        <form action="{% url 'cart_update' %}" method="POST" style="width: 40px;">
+                                        <form action="{% url 'users:cart_update' %}" method="POST" style="width: 40px;">
                                             {% csrf_token %}
                                             <input type="hidden" name="plus" value="{{ p.id }}">
                                             <button type="submit" class="qty-btn qty-plus" title="Increase Quantity"><i class="bi bi-plus"></i></button>
                                         </form>
                                     </div>
-                                    <form action="{% url 'bynow' %}" method="post">
+                                    <form action="{% url 'users:bynow' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="bynow" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
                                     </form>
                                     {% else %}
-                                    <form action="{% url 'cart_update' %}" method="post">
+                                    <form action="{% url 'users:cart_update' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="plus" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-add-cart"><i class="bi bi-cart-plus"></i>Add to Cart</button>
                                     </form>
-                                    <form action="{% url 'bynow' %}" method="post">
+                                    <form action="{% url 'users:bynow' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="bynow" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>
@@ -1203,7 +1203,7 @@
 
                                 <!-- Product Actions -->
                                 <div class="product-actions">
-                                    <form action="{% url 'cart_update' %}" method="post">
+                                    <form action="{% url 'users:cart_update' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="plus" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-add-cart"><i class="bi bi-cart-plus"></i>Add to Cart</button>
@@ -1238,12 +1238,12 @@
 
                                 <!-- Product Actions -->
                                 <div class="product-actions">
-                                    <form action="{% url 'cart_update' %}" method="post">
+                                    <form action="{% url 'users:cart_update' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="plus" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-add-cart"><i class="bi bi-cart-plus"></i>Add to Cart</button>
                                     </form>
-                                    <form action="{% url 'bynow' %}" method="post">
+                                    <form action="{% url 'users:bynow' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="bynow" value="{{ p.id }}">
                                         <button type="submit" class="btn-action btn-buy-now"><i class="bi bi-lightning-charge"></i>Buy Now</button>

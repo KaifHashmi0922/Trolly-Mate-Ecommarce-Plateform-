@@ -51,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "accounts.middleware.AdminURLProtectionMiddleware",
     # 'Users.middles.OTPExceptionMiddleware',
 ]
 
@@ -84,30 +85,28 @@ LOGIN_URL = 'admin_login'  # your admin login url name stays same
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 
-LOGIN_URL = "admin_login"          # name of your login URL in accounts/urls.py
-LOGIN_REDIRECT_URL = "dashbord"
 
 
-
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'shoping_website',   
-#         'USER': 'root',
-#         'PASSWORD':'root',
-#         'PORT':3306,
-#         'HOST':'localhost',
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'shoping_website',   
+        'USER': 'root',
+        'PASSWORD':'root',
+        'PORT':3306,
+        'HOST':'localhost',
+    }
+}
 
 
 # Password validation

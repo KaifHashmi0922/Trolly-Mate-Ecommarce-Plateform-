@@ -38,7 +38,7 @@
   </div>
 
   <div class="search-bar">
-    <form class="search-form d-flex align-items-center" method="GET" action="{% url 'searchbar' %}">
+    <form class="search-form d-flex align-items-center" method="GET" action="{% url 'users:searchbar' %}">
       <input type="text" name="query" placeholder="Search" title="Enter search keyword">
       <button type="submit" title="Search"><i class="bi bi-search"></i></button>
     </form>
@@ -61,13 +61,13 @@
         </li>
       {% else %}
         <li>
-          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="{% url 'login' %}">
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="{% url 'users:login' %}">
             <img src="{% static 'assets/img/guest.png' %}" height=40 alt="Profile" class="rounded-circle">
             Guest
           </a>
         </li>
         <li>
-          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="{% url 'login' %}">Login</a>
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="{% url 'users:login' %}">Login</a>
         </li>
         <li>
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="/signup/">Sign Up</a>

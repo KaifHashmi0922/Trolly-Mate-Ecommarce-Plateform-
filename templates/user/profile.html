@@ -214,7 +214,7 @@
     <header class="admin-header fixed-top shadow-lg px-4 py-3 z-3">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center">
-                <a href="{% url 'index' %}" class="d-flex align-items-center text-decoration-none">
+                <a href="{% url 'users:index' %}" class="d-flex align-items-center text-decoration-none">
                     <i class="bi bi-cart4 fs-2" style="background: var(--primary-gradient); color: white; padding: 12px; border-radius: 16px; box-shadow: var(--admin-glow);"></i>
                     <span class="fw-bold fs-3 ms-3" style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Trollymate</span>
                 </a>
@@ -324,7 +324,7 @@
 
                                 <!-- Edit Profile Tab -->
                                 <div class="tab-pane fade" id="profile-edit">
-                                    <form method="POST" enctype="multipart/form-data" action="{% url 'cust_update' %}" class="needs-validation" novalidate>
+                                    <form method="POST" enctype="multipart/form-data" action="{% url 'users:cust_update' %}" class="needs-validation" novalidate>
                                         {% csrf_token %}
                                         <div class="row g-4">
                                             <div class="col-md-6">
@@ -356,7 +356,7 @@
                                             <button type="submit" class="btn btn-modern btn-primary px-6 me-3 shadow-lg">
                                                 <i class="bi bi-check-circle-fill me-2"></i>Save Changes
                                             </button>
-                                            <a href="{% url 'cust_soft' %}" class="btn btn-modern btn-danger px-6 shadow-lg">
+                                            <a href="{% url 'users:cust_soft' %}" class="btn btn-modern btn-danger px-6 shadow-lg">
                                                 <i class="bi bi-trash3-fill me-2"></i>Delete Account
                                             </a>
                                         </div>
@@ -437,7 +437,7 @@
                                         </div>
                                         <h4 class="text-primary mb-3 fw-bold">No Orders Yet</h4>
                                         <p class="text-white-50 lead mb-5">Start your shopping journey with Trollymate!</p>
-                                        <a href="{% url 'index' %}" class="btn btn-modern btn-primary px-6 shadow-lg">
+                                        <a href="{% url 'users:index' %}" class="btn btn-modern btn-primary px-6 shadow-lg">
                                             <i class="bi bi-shop me-2"></i>Start Shopping
                                         </a>
                                     </div>
@@ -460,7 +460,7 @@
                                                         </div>
                                                     {% endif %}
 
-                                                    <form method="POST" action="{% url 'cust_update' %}" class="needs-validation" novalidate id="passwordForm">
+                                                    <form method="POST" action="{% url 'users:cust_update' %}" class="needs-validation" novalidate id="passwordForm">
                                                         {% csrf_token %}
                                                         <!-- ✅ NO HIDDEN FIELD - FIELD NAMES ONLY -->
                                                         

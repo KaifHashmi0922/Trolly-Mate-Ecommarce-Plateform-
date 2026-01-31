@@ -1,0 +1,107 @@
+{% extends "admins/dashbord.html" %}
+{% load static %}
+
+{% block show %}
+<!-- Header -->
+<div class="header-section mb-5">
+    <div class="row align-items-center">
+        <div class="col-lg-8">
+            <h1 class="display-6 fw-bold mb-2">
+                <i class="bi bi-pencil-square me-2 text-primary"></i>
+                Edit Profile
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'admins:dashbord' %}">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'admins:admin_profile' %}">Profile</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Edit
+                    </li>
+                </ol>
+            </nav>
+            <p class="text-muted mt-2">
+                Update your personal details.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Update Form -->
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+
+                {% if messages %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {% for message in messages %}
+                            {{ message }}
+                        {% endfor %}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endif %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <!-- Username - Editable -->
+                        <div class="col-md-6">
+                            <label class="form-label">Username <span class="text-danger">*</span></label>
+                            <input type="text" 
+                                   name="username"
+                                   class="form-control"
+                                   value="{{ user.username }}"
+                                   required>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="col-md-6">
+                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" 
+                                   name="email"
+                                   class="form-control"
+                                   value="{{ user.email }}"
+                                   required>
+                            {% if field_errors.email %}
+                                <div class="text-danger small">
+                                    {% for error in field_errors.email %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {% comment %} <!-- Role Dropdown -->
+                        <label for="role">Select Role</label>
+                        <select name="role" id="role" class="form-control">
+                            <option value="{{ user.role }}">{{ user.role }}</option>
+                            <option value="superadmin">Super Admin</option>
+                            <option value="admin">Admin</option>
+                            <option value="staff">Staff</option>
+                        </select> {% endcomment %}
+
+                     </div>
+
+                    <!-- Actions -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'admins:admin_profile' %}"
+                           class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>
+                            Back
+                        </a>
+
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-save me-1"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

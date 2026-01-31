@@ -187,7 +187,7 @@
 
                         <!-- Forgot Password -->
                         <div class="d-flex justify-content-end mb-4">
-                            <a href="{% url 'forget_pass_email' %}" class="text-muted text-decoration-none fw-medium">
+                            <a href="{% url 'users:forget_pass_email' %}" class="text-muted text-decoration-none fw-medium">
                                 <i class="bi bi-question-circle me-1"></i>Forgot Password?
                             </a>
                         </div>
@@ -203,7 +203,7 @@
                     <div class="text-center pt-3">
                         <p class="mb-0 text-muted">
                             Don't have an account? 
-                            <a href="{% url 'signup' %}" class="fw-bold text-primary text-decoration-none">
+                            <a href="{% url 'users:signup' %}" class="fw-bold text-primary text-decoration-none">
                                 Create Account
                             </a>
                         </p>

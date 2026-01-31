@@ -140,7 +140,7 @@
                     {% endif %}
 
                     <!-- Address Form -->
-                    <form method="POST" action="{% url 'add_address' %}" class="needs-validation" novalidate>
+                    <form method="POST" action="{% url 'users:add_address' %}" class="needs-validation" novalidate>
                         {% csrf_token %}
                         
                         <!-- Full Name -->

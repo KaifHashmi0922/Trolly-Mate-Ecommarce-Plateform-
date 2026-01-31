@@ -156,7 +156,7 @@
                     </div>
 
                     <!-- DYNAMIC FORM -->
-                    <form method="post" action="{% url 'forget_pass_email' %}" class="needs-validation" novalidate>
+                    <form method="post" action="{% url 'users:forget_pass_email' %}" class="needs-validation" novalidate>
                         {% csrf_token %}
                         
                         {% if status %}
@@ -199,7 +199,7 @@
                         <!-- Phone fallback (only on send screen) -->
                         {% if not status %}
                         <div class="text-center mb-4">
-                            <a href="{% url 'forget_pass_phone' %}" class="text-muted text-decoration-none">
+                            <a href="{% url 'users:forget_pass_phone' %}" class="text-muted text-decoration-none">
                                 <i class="bi bi-phone me-1"></i> Use phone number instead
                             </a>
                         </div>
@@ -218,7 +218,7 @@
 
                     <!-- Back to login -->
                     <div class="text-center">
-                        <a href="{% url 'login' %}" class="text-muted text-decoration-none fw-medium">
+                        <a href="{% url 'users:login' %}" class="text-muted text-decoration-none fw-medium">
                             <i class="bi bi-arrow-left me-1"></i>Back to Login
                         </a>
                     </div>
