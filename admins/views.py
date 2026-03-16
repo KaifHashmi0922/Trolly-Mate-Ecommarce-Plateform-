@@ -78,7 +78,9 @@ def dashbord(request):
     """
     try:
         today = timezone.now().date()
+        print( today)
         yesterday = today - timedelta(days=1)
+        print(yesterday)
 
         context = {
             "total_customers": Customer.objects.filter(status=True).count(),
@@ -102,11 +104,13 @@ def dashbord(request):
     return render(request, "admins/dashbord.html", context)
 
 
+
 @admin_login_required
 @role_required(AdminRole.SUPER_ADMIN, AdminRole.ADMIN, AdminRole.STAFF)
 def admin_profile(request):
-    today = timezone.now().date()
-    yesterday = today - timedelta(days=1)
+    
+    today = timezone.now().date()   
+    yesterday = today - timedelta(days=1)   
 
     context = {
         "total_customers": Customer.objects.filter(status=True).count(),
@@ -648,6 +652,7 @@ def get_low_stock_products(request):
 # ============================================================================
 #  ANALYTICS & CHARTS (MAIN FEATURE)
 # ============================================================================
+
 @admin_login_required
 @role_required(AdminRole.SUPER_ADMIN)
 def admin_analytics(request):

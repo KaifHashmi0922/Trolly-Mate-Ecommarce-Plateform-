@@ -676,7 +676,7 @@ def payment(request):
 
     products = Products.objects.filter(id__in=product_ids)
     
-    # 🔥 STORE YOUR Shoping orders
+    #  STORE YOUR Shoping orders
     c_id = request.session.get('cust_id')
     selected_id = request.session.get('selected_address_id')
     
@@ -717,8 +717,7 @@ def payment(request):
     request.session['cart'] = {}
     request.session.modified = True
 
-    if email:
-        send_invoice_email(request, email, product_ids)
+    
 
     today = timezone.now().date()
     context = {
@@ -726,6 +725,13 @@ def payment(request):
         'cust_name': cust_name, 'cust_email': email, 'address': address,
         'order_id': None, 'payment_mode': 'Online (Demo)', 'order_date': today,
     }
+    try:
+        if email:
+            send_invoice_email(request, context)
+    except Exception as e:
+        print("Invoice email error:", e)
+   
+
     return render(request, "user/invoice.html", context)
 
 

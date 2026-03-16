@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+{% load static %}
+{% load my_filter %}
+<html>
+<head>
+<meta charset="utf-8">
+
+<style>
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size:12px;
+    color:#333;
+}
+
+.header{
+    background:#4f46e5;
+    color:white;
+    padding:15px;
+}
+
+.company{
+    font-size:22px;
+    font-weight:bold;
+}
+
+.invoice-title{
+    font-size:18px;
+    margin-top:5px;
+}
+
+.section{
+    margin-top:20px;
+}
+
+.address-box{
+    width:48%;
+    border:1px solid #ddd;
+    padding:10px;
+}
+
+.table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+.table th{
+    background:#f3f4f6;
+    border:1px solid #ddd;
+    padding:8px;
+    text-align:left;
+}
+
+.table td{
+    border:1px solid #ddd;
+    padding:8px;
+}
+
+.text-right{
+    text-align:right;
+}
+
+.total-box{
+    margin-top:20px;
+    width:40%;
+    float:right;
+}
+
+.total-box td{
+    padding:6px;
+}
+
+.grand-total{
+    font-size:16px;
+    font-weight:bold;
+    color:#16a34a;
+}
+
+.footer{
+    margin-top:40px;
+    text-align:center;
+    font-size:11px;
+    color:#777;
+}
+
+.product-img{
+    width:45px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+<div class="company">Trollymate</div>
+<div class="invoice-title">Order Invoice</div>
+Order ID: #TM{{ order_id|default:"123456" }}<br>
+Date: {{ order_date }}<br>
+Payment Mode: {{ payment_mode }}
+</div>
+
+
+<!-- ADDRESS SECTION -->
+<table width="100%" class="section">
+<tr>
+
+<td class="address-box">
+<b>Delivery Address</b><br><br>
+
+{% if address %}
+<b>{{ address.fullname }}</b><br>
+{{ address.house }}, {{ address.area }}<br>
+{{ address.city }}, {{ address.state }} - {{ address.pincode }}<br>
+{{ address.country }}<br>
+📞 {{ address.phone }}
+{% else %}
+No address available
+{% endif %}
+
+</td>
+
+<td width="4%"></td>
+
+<td class="address-box">
+
+<b>Billed To</b><br><br>
+
+{{ cust_name }}<br>
+{{ cust_email }}
+
+</td>
+
+</tr>
+</table>
+
+
+<!-- PRODUCT TABLE -->
+<table class="table">
+
+<tr>
+<th width="45%">Product</th>
+<th width="15%">Qty</th>
+<th width="20%">Price</th>
+<th width="20%">Total</th>
+</tr>
+
+{% for item in line_items %}
+
+<tr>
+
+<td>
+
+<table>
+<tr>
+
+<td width="50">
+
+{% if item.product.image %}
+<img src="{{ item.product.image.url }}" class="product-img">
+{% endif %}
+
+</td>
+
+<td>
+
+<b>{{ item.product.name }}</b><br>
+SKU: {{ item.product.id }}
+
+</td>
+
+</tr>
+</table>
+
+</td>
+
+<td>{{ item.qty }}</td>
+
+<td class="text-right">{{ item.price|Currency }}</td>
+
+<td class="text-right"><b>{{ item.total|Currency }}</b></td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+
+<!-- TOTAL -->
+<table class="total-box">
+
+<tr>
+<td>Subtotal</td>
+<td class="text-right">{{ grand_total|Currency }}</td>
+</tr>
+
+<tr>
+<td>Platform Fee</td>
+<td class="text-right">FREE</td>
+</tr>
+
+<tr>
+<td>Delivery Charges</td>
+<td class="text-right">FREE</td>
+</tr>
+
+<tr class="grand-total">
+<td>Grand Total</td>
+<td class="text-right">{{ grand_total|Currency }}</td>
+</tr>
+
+</table>
+
+
+<div style="clear:both"></div>
+
+
+<!-- FOOTER -->
+<div class="footer">
+
+Thank you for shopping with <b>Trollymate</b> 🛒 <br>
+For support contact: support@trollymate.com
+
+</div>
+
+</body>
+</html>
